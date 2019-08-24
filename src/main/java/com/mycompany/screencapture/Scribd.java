@@ -165,6 +165,10 @@ public class Scribd extends javax.swing.JFrame {
 //        3081,506
 //        1760,164,2346,919
 //        2346,164,2924,919
+
+
+//        2452,509
+//        1719,165,2216,911
         robot.setAutoDelay(100);
 
         robot.mouseMove(1900,600);
