@@ -6,8 +6,10 @@ import java.awt.datatransfer.*;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Field;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -16,7 +18,7 @@ import java.util.TimerTask;
 /**
  * Created by almatarm on 23/08/2019.
  */
-public class RobotHelper {
+public class Helper {
     private static Robot robot;
 
     static {
@@ -213,6 +215,30 @@ public class RobotHelper {
                 e.printStackTrace();
             }
             return "";
+        }
+    }
+
+    public static class Web {
+        public static void downloadImage(String urlStr, String file) {
+            try {
+                URL url = new URL(urlStr);
+                InputStream in = new BufferedInputStream(url.openStream());
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                byte[] buf = new byte[1024];
+                int n = 0;
+                while (-1!=(n=in.read(buf))) {
+                    out.write(buf, 0, n);
+                }
+                out.close();
+                in.close();
+                byte[] response = out.toByteArray();
+
+                FileOutputStream fos = new FileOutputStream(file);
+                fos.write(response);
+                fos.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 }

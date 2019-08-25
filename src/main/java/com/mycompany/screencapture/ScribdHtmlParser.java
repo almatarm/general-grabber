@@ -19,7 +19,7 @@ public class ScribdHtmlParser {
     String content;
 
     public static final String FONT_SIZE_NORMAL = "24";
-    public static final String FONT_SIZE_H3 = "30";
+    public static final String FONT_SIZE_H3     = "30";
 
     ScribdHtmlParser(String content) {
         this.content = content;
