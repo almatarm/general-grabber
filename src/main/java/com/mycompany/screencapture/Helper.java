@@ -122,6 +122,25 @@ public class Helper {
         robot.delay(250);
     }
 
+    public static void tab() {
+        type(KeyEvent.VK_TAB);
+    }
+
+    public static void arrowDown() {
+        type(KeyEvent.VK_DOWN);
+    }
+
+    public static void enter() {
+        type(KeyEvent.VK_ENTER);
+    }
+
+    public static void type(int key) {
+        robot.delay(250);
+        robot.keyPress(key);
+        robot.keyRelease(key);
+        robot.delay(250);
+    }
+
     public static class ClipBoard {
         public static void setContent(String content) {
             StringSelection data = new StringSelection(content);
@@ -147,7 +166,7 @@ public class Helper {
     }
 
     public static class Mouse {
-        public static void rightClick(int x, int y) {
+        public static void clickB1(int x, int y) {
             moveMouse(x, y, 10);
             robot.mousePress(InputEvent.BUTTON1_MASK);
             robot.mouseRelease(InputEvent.BUTTON1_MASK);
