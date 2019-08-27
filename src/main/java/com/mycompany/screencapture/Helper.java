@@ -260,4 +260,12 @@ public class Helper {
             }
         }
     }
+
+    public static class Debug {
+        public static boolean isDebug = false;
+
+        public static void println(String msg) {
+            if(isDebug) System.out.println(msg);
+        }
+    }
 }

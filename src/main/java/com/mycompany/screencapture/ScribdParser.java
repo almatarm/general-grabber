@@ -1,25 +1,40 @@
 package com.mycompany.screencapture;
 
+import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FilenameFilter;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 import static com.mycompany.screencapture.ScribdHtmlParser.FONT_SIZE_H3;
+import static java.nio.file.StandardCopyOption.*;
 
 /**
  * Created by almatarm on 24/08/2019.
  */
 public class ScribdParser {
-    boolean lastLineEndsWithHyphen = false;
-    boolean isLineEndsWithHyphen = false;
-    boolean isTheLastLineInParagraph = false;
-    boolean isBoldStart = false;
-    boolean isBoldEnd = false;
+
+    int chapterCount;
+
+    enum Status {
+        TagBegin, TagBody, TagEnd, NoTag;
+    }
+    boolean lastLineEndsWithHyphen   = false;
+    boolean isLineEndsWithHyphen     = false;
+    boolean isLineBreak = false;
+    Status bold = Status.NoTag;
+    Status italic = Status.NoTag;
 
     String text;
     Map<String, String> params = new HashMap<>();
@@ -28,8 +43,19 @@ public class ScribdParser {
     StringBuilder secBuff = new StringBuilder();
 
 
+    int chapterIdx = 1;
+    int linkIdx = 1;
+
+    public ScribdParser(int chapterCount) {
+        this.chapterCount = chapterCount;
+    }
+
     public void addContent(String content) {
         Document doc = Jsoup.parse(content);
+        if(buff.length() > 0) {
+            buff.append(String.format("<a name=\"TOC%03d\"/>\n", chapterIdx));
+            chapterIdx++;
+        }
         Elements textElements =
                 doc.getElementsByAttribute("data-position");
                 //doc.getElementsByClass("text_line");
@@ -37,10 +63,10 @@ public class ScribdParser {
     }
 
     private void processElement(Element element) {
-        preUpdateStatus(element);
         if(!element.getElementsByTag("img").isEmpty()) {
             processImage(element);
-        } else if(element.childNodeSize() == 2) {
+        } else if(!isMixedElement(element)) {
+            preUpdateStatus(element, false);
             processTextOnlyElement(element);
         } else {
             processMixedElement(element);
@@ -48,31 +74,36 @@ public class ScribdParser {
         postUpdateStatus(element);
     }
 
+    private boolean isMixedElement(Element e) {
+        return !e.children().isEmpty() && e.child(0).hasAttr("data-lineindex");
+    }
 
     private void processImage(Element element) {
         Element img = element.getElementsByTag("img").iterator().next();
         String src = img.attr("src");
         String imgFileName = src.substring(src.lastIndexOf("/") +1, src.indexOf("?"));
-        buff.append(String.format("\n<img src=\"%s\" height=%s width=%s />\n<br/>\n", imgFileName, img.attr("height"), img.attr("width")));
+        buff.append(String.format("\n<img src=\"images/%s\" height=%s width=%s />\n<br/>\n", imgFileName, img.attr("height"), img.attr("width")));
     }
 
     private void processTextOnlyElement(Element element) {
         try {
-            if (isLineEndsWithHyphen) {
-                text = text.substring(0, text.indexOf("-"));
-            }
+            Helper.Debug.println("text: " + text);
             if (lastLineEndsWithHyphen) {
                 //Get first word and append it to last line
                 int firstSpaceIdx = text.indexOf(" ");
                 if (firstSpaceIdx == -1) firstSpaceIdx = text.length() -1;
+                while(secBuff.charAt(secBuff.length() -1) == ' ') secBuff.deleteCharAt(secBuff.length() -1);
                 secBuff.append(text.substring(0, firstSpaceIdx) + "\n");
                 text = text.substring(firstSpaceIdx + 1);
             }
-            if(isBoldStart) secBuff.append("<b>");
+            if(bold == Status.TagBegin) secBuff.append("<b>");
+            if(italic == Status.TagBegin) secBuff.append("<i>");
+            if(italic == Status.TagEnd) secBuff.append("</i>");
+            if(bold == Status.TagEnd) secBuff.append("</b>");
             secBuff.append("\t" + text + (isLineEndsWithHyphen ? "" : "\n"));
-            if(isBoldEnd) secBuff.append("</b>");
 
-            if (isTheLastLineInParagraph) {
+
+            if (isLineBreak) {
                 String tag = getParagraphTag(fontSizes);
                 buff.append(String.format("<%s>\n%s</%s>\n", tag, secBuff.toString(), tag));
                 secBuff.delete(0, secBuff.length());
@@ -86,52 +117,115 @@ public class ScribdParser {
 
     StringBuilder linkText = new StringBuilder();
     private void processMixedElement(Element element) {
+        Helper.Debug.println("mixd: " + text);
         element.children().forEach(e -> {
+            preUpdateStatus(e, true);
+
+            if (lastLineEndsWithHyphen) {
+                //Get first word and append it to last line
+                int firstSpaceIdx = text.indexOf(" ");
+                if (firstSpaceIdx == -1) firstSpaceIdx = text.length() -1;
+                while(secBuff.charAt(secBuff.length() -1) == ' ') secBuff.deleteCharAt(secBuff.length() -1);
+                secBuff.append(text.substring(0, firstSpaceIdx) + "\n");
+                text = text.substring(firstSpaceIdx + 1);
+            }
+
+            boolean isLink = false;
+            if(bold == Status.TagBegin) secBuff.append("<b>");
+            if(italic == Status.TagBegin) secBuff.append("<i>");
+            if(italic == Status.TagEnd) secBuff.append("</i>");
+            if(bold == Status.TagEnd) secBuff.append("</b>");
 
             //Handle Links
             if(!e.children().isEmpty() && e.child(0).hasClass("first_link_part")) {
                 linkText.delete(0, linkText.length());
+                isLink = true;
             }
 
             if(e.hasClass("link_part") || (!e.children().isEmpty() && e.child(0).hasClass("link_part"))) {
                 linkText.append(e.text().trim().isEmpty()? " " : e.text());
+                isLink = true;
             }
 
             if(!e.children().isEmpty() && e.child(0).hasClass("last_link_part")) {
-                System.out.println(linkText.toString());
+                if (linkIdx < chapterCount) {
+                    secBuff.append(String.format("<a href=\"#TOC%03d\">%s</a>", linkIdx++, linkText));
+                } else {
+                    secBuff.append(String.format("<a href=#>%s</a>", linkText));
+                }
+                isLink = true;
+            }
+
+            if (!isLink) {
+                secBuff.append(text + " ");
+            }
+
+            if (isLineBreak) {
+                String tag = getParagraphTag(fontSizes);
+                buff.append(String.format("<%s>\n%s</%s>\n", tag, secBuff.toString(), tag));
+                secBuff.delete(0, secBuff.length());
+                fontSizes.clear();
             }
         });
-//        if(isLineEndsWithHyphen) {
-//            text = text.substring(0, text.indexOf("-"));
-//        }
-//        if(lastLineEndsWithHyphen) {
-//            //Get first word and append it to last line
-//            int firstSpaceIdx = text.indexOf(" ");
-//            if(firstSpaceIdx > -1);
-//            secBuff.append(text.substring(0, firstSpaceIdx) + "\n");
-//            text = text.substring(firstSpaceIdx + 1);
-//        }
-//        secBuff.append("\t" + text + (isLineEndsWithHyphen ? "" : "\n"));
-//
-//        if(isTheLastLineInParagraph) {
-//            String tag = getParagraphTag(fontSizes);
-//            buff.append(String.format("<%s>\n%s</%s>\n", tag, secBuff.toString(), tag));
-//            secBuff.delete(0, secBuff.length());
-//            fontSizes.clear();
-//        }
     }
-    private void preUpdateStatus(Element element) {
+    private void preUpdateStatus(Element element, boolean mixed) {
         text = element.text();
-        params = parseElement(element);
+        Helper.Debug.println("preU: " + text);
+        params = mixed && !element.children().isEmpty() ? parseElement(element.child(0)): parseElement(element);
         if(params.containsKey(STYLE_FONT_SIZE)) {
             fontSizes.add(params.get(STYLE_FONT_SIZE));
         }
-        isLineEndsWithHyphen = text.endsWith("-");
-        isTheLastLineInParagraph = endOfParagraph(element);
+        if(params.containsKey(STYLE_FONT_WEIGHT)) {
+            switch(bold) {
+                case NoTag:
+                    bold = Status.TagBegin;
+                    break;
+                case TagBegin:
+                    bold = Status.TagBody;
+                    break;
+            }
+        } else {
+            switch (bold) {
+                case TagBegin:
+                case TagBody:
+                    bold = Status.TagEnd;
+                    break;
+                default:
+                    bold = Status.NoTag;
+            }
+        }
+
+        if(params.containsKey(STYLE_FONT_STYLE)) {
+            switch(italic) {
+                case NoTag:
+                    italic = Status.TagBegin;
+                    break;
+                case TagBegin:
+                    italic = Status.TagBody;
+                    break;
+            }
+        } else {
+            switch (italic) {
+                case TagBegin:
+                case TagBody:
+                    italic = Status.TagEnd;
+                    break;
+                default:
+                    italic = Status.NoTag;
+            }
+        }
+
+        isLineBreak = endOfParagraph(element);
+        isLineEndsWithHyphen = (text.trim().isEmpty() && isLineEndsWithHyphen) || text.endsWith("-");
+        if (!text.trim().isEmpty() && isLineEndsWithHyphen) {
+            text = text.substring(0, text.indexOf("-"));
+        }
+        Helper.Debug.println("Hyph: " + isLineEndsWithHyphen);
     }
 
     private void postUpdateStatus(Element element) {
         lastLineEndsWithHyphen = isLineEndsWithHyphen;
+        Helper.Debug.println("post: " + text + "#" + isLineEndsWithHyphen + "#" + lastLineEndsWithHyphen);
     }
 
     private boolean endOfParagraph(Element element) {
@@ -146,6 +240,7 @@ public class ScribdParser {
 
     public static final String STYLE_FONT_SIZE = "font-size";
     public static final String STYLE_FONT_WEIGHT = "font-weight";
+    public static final String STYLE_FONT_STYLE = "font-style";
     public Map<String, String> parseElement(Element element) {
         Map<String, String> param = new HashMap<>();
         String[] styles = element.attr("style").split(";");
@@ -163,21 +258,15 @@ public class ScribdParser {
                         break;
                     case STYLE_FONT_WEIGHT:
                         value = value.trim();
-                        if(param.containsKey(STYLE_FONT_WEIGHT)) {
-                            isBoldStart = false;
-                            isBoldEnd = false;
-                        } else {
-                            param.put(STYLE_FONT_WEIGHT, value);
-                            isBoldStart = true;
-                            isBoldEnd = false;
-                        }
+                        param.put(STYLE_FONT_WEIGHT, value);
+                        break;
+                    case STYLE_FONT_STYLE:
+                        value = value.trim();
+                        param.put(STYLE_FONT_STYLE, value);
                         break;
 
                 }
             }
-        }
-        if(!element.attr("style").contains(STYLE_FONT_WEIGHT)) {
-            isBoldStart = false; isBoldEnd = true;
         }
         return param;
     }
@@ -196,9 +285,10 @@ public class ScribdParser {
     }
 
     public static void main(String[] args) {
+        Helper.Debug.isDebug = false;
         String bookName = "Frank Lloyd Wright and Mason City - Roy R. Behrens";
         bookName = "Craft Coffee - Jessica Easto and Andreas Willhoff";
-//        bookName = "Beginner Calisthenics";
+        bookName = "Beginner Calisthenics";
 
         String prefix = "Chapter";
 
@@ -211,13 +301,53 @@ public class ScribdParser {
         }));
         Collections.sort(pages);
 
-        ScribdParser parser = new ScribdParser();
+        ScribdParser parser = new ScribdParser(pages.size() - 1);
         for (File chapter : pages) {
             System.out.println(chapter.getAbsolutePath());
             parser.addContent(Helper.iFile.read(chapter.getAbsolutePath()));
         }
-        Helper.iFile.write(new File(baseDir, baseDir.getName() + ".html").getAbsolutePath(), parser.getHTML());
+        String html = parser.getHTML();
 
+
+        try {
+            //Creating epub - http://www.jedisaber.com/eBooks/Tutorial.shtml
+            File epub = new File(baseDir, "epub");
+            epub.delete();
+            epub.mkdirs();
+
+            File oebps = new File(epub, "OEBPS");
+            oebps.mkdir();
+            Helper.iFile.write(new File(oebps, "contents.html").getAbsolutePath(), html);
+
+            //Copy images
+            File images = new File(oebps, "images");
+            images.mkdir();
+            List<File> imagesFiles = Arrays.asList(baseDir.listFiles(new FileFilter() {
+                @Override
+                public boolean accept(File file) {
+                    return !file.getName().contains("html") && file.isFile();
+                }
+            }));
+            for(File file: imagesFiles) {
+                FileUtils.copyFile(file, new File(images, file.getName()));
+            };
+
+            //copy mimeType
+            File mimetype = new File(
+                    parser.getClass().getClassLoader().getResource("mimetype").getFile()
+            );
+            FileUtils.copyFile(mimetype, new File(epub, "mimetype"));
+
+            //Meta-info
+            File metaInfo = new File(epub, "META-INF");
+            metaInfo.mkdir();
+            File container = new File(
+                    parser.getClass().getClassLoader().getResource("META-INF/container.xml").getFile()
+            );
+            FileUtils.copyFile(mimetype, new File(metaInfo, "container.xml"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }
