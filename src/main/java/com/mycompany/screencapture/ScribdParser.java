@@ -53,7 +53,7 @@ public class ScribdParser {
         Element img = element.getElementsByTag("img").iterator().next();
         String src = img.attr("src");
         String imgFileName = src.substring(src.lastIndexOf("/") +1, src.indexOf("?"));
-        buff.append(String.format("\n<img src=\"%s\" height=%s width=%s />\n", imgFileName, img.attr("height"), img.attr("width")));
+        buff.append(String.format("\n<img src=\"%s\" height=%s width=%s />\n<br/>\n", imgFileName, img.attr("height"), img.attr("width")));
     }
 
     private void processTextOnlyElement(Element element) {
@@ -198,7 +198,7 @@ public class ScribdParser {
     public static void main(String[] args) {
         String bookName = "Frank Lloyd Wright and Mason City - Roy R. Behrens";
         bookName = "Craft Coffee - Jessica Easto and Andreas Willhoff";
-        bookName = "Beginner Calisthenics";
+//        bookName = "Beginner Calisthenics";
 
         String prefix = "Chapter";
 

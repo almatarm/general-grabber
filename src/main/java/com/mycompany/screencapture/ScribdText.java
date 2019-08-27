@@ -32,7 +32,7 @@ public class ScribdText {
 
         String bookName = "Frank Lloyd Wright and Mason City - Roy R. Behrens";
         bookName = "Craft Coffee - Jessica Easto and Andreas Willhoff";
-        bookName = "Beginner Calisthenics";
+//        bookName = "Beginner Calisthenics";
 
 
 
@@ -40,14 +40,16 @@ public class ScribdText {
 
 
 
-        int start = 11;
-        int repeat = 30;
+        int start = 51;
+        int repeat = 80;
+        boolean downloadImages = false;
 
 //        int renderedSrcX = 1341, renderedSrcY = 85; //Mac
-//        int renderedSrcX = 3262, renderedSrcY = 88; //Dell Screen
-        int renderedSrcX = 1828, renderedSrcY = 88; //iMac Work
+        int renderedSrcX = 3262, renderedSrcY = 88; //Dell Screen
+//        int renderedSrcX = 1828, renderedSrcY = 88; //iMac Work
 
-        int tocX = 576, tocY = 134; //iMac Work
+        int tocX = 2014, tocY = 131; //Dell Screen
+//        int tocX = 576, tocY = 134; //iMac Work
 
         //Create directory on the desktop
         File baseDir = new File(System.getProperty("user.home") + "/Desktop/Scribd/raw/" + bookName);
@@ -60,13 +62,13 @@ public class ScribdText {
             System.out.println("Ready");
 
             for(int i = 0; i < repeat; i++) {
-                writePageToDisk(renderedSrcX, renderedSrcY, baseDir, String.format("Page %03d.html", start+ i));
+                writePageToDisk(renderedSrcX, renderedSrcY, baseDir, String.format("Page %03d.html", start+ i), downloadImages);
             }
         };
 
 
         ActionListener parseByChapter = e -> {
-            Helper.delay(5000);
+            Helper.delay(500);
             System.out.println("Ready");
 
             for(int i = start; i <= repeat; i++) {
@@ -76,12 +78,12 @@ public class ScribdText {
                 Helper.tab();
                 for(int j = 0; j < i -1; j++) {
                     Helper.arrowDown();
-                    Helper.delay(120);
+                    Helper.delay(50);
                 }
                 Helper.enter();
 
-                Helper.delay(5000);
-                writePageToDisk(renderedSrcX, renderedSrcY, baseDir, String.format("Chapter %03d.html", i));
+                Helper.delay(500);
+                writePageToDisk(renderedSrcX, renderedSrcY, baseDir, String.format("Chapter %03d.html", i), downloadImages);
             }
         };
 
@@ -89,6 +91,10 @@ public class ScribdText {
     }
 
     private static void writePageToDisk(int renderedSrcX, int renderedSrcY, File baseDir, String fileName) {
+        writePageToDisk(renderedSrcX, renderedSrcY, baseDir, fileName, true);
+    }
+
+    private static void writePageToDisk(int renderedSrcX, int renderedSrcY, File baseDir, String fileName, boolean downloadImages) {
         boolean pageHasImages = false;
 
         Helper.Mouse.clickB1(renderedSrcX, renderedSrcY);
@@ -99,21 +105,24 @@ public class ScribdText {
         String contents = Helper.ClipBoard.getContent();
         contents = contents.substring(contents.indexOf("<!DOCTYPE html>"));
 
+
         //Get Images
-        Document doc = Jsoup.parse(contents);
-        Element aria_main = doc.getElementById("aria_main");
-        if(aria_main != null) {
-            Elements imgs = aria_main.getElementsByTag("img");
-            imgs.forEach(img -> {
-                String src = img.attr("src");
-                String url = "https://www.scribd.com" + src;
-                String imgFileName = src.substring(src.lastIndexOf("/") +1, src.indexOf("?"));
-                String filePath = new File(baseDir, imgFileName).getAbsolutePath();
-                System.out.println("Downloading... " + url + " -> " + filePath);
-                Helper.Web.downloadImage(url, filePath);
-                Helper.delay(5000);
-            });
-            pageHasImages = !imgs.isEmpty();
+        if(downloadImages) {
+            Document doc = Jsoup.parse(contents);
+            Element aria_main = doc.getElementById("aria_main");
+            if (aria_main != null) {
+                Elements imgs = aria_main.getElementsByTag("img");
+                imgs.forEach(img -> {
+                    String src = img.attr("src");
+                    String url = "https://www.scribd.com" + src;
+                    String imgFileName = src.substring(src.lastIndexOf("/") + 1, src.indexOf("?"));
+                    String filePath = new File(baseDir, imgFileName).getAbsolutePath();
+                    System.out.println("Downloading... " + url + " -> " + filePath);
+                    Helper.Web.downloadImage(url, filePath);
+                    Helper.delay(5000);
+                });
+                pageHasImages = !imgs.isEmpty();
+            }
         }
         String pagePath = new File(baseDir,fileName).getAbsolutePath();
         Helper.iFile.write(pagePath, Helper.ClipBoard.getContent());
@@ -122,7 +131,7 @@ public class ScribdText {
         Helper.delay(1000);
         Helper.clickRight();
 
-        Helper.delay((int) (Math.random() * 20000) + (pageHasImages? 10000: 0));
+//        Helper.delay((int) (Math.random() * 20000) + (pageHasImages? 10000: 0));
     }
 
 }
