@@ -26,6 +26,10 @@ import static java.nio.file.StandardCopyOption.*;
 public class ScribdParser {
 
     int chapterCount;
+    int firstChapterIdx = 5;
+    boolean isTOCProccessed = false;
+    boolean newChapter = false;
+    List<String> toc = new ArrayList<>();
 
     enum Status {
         TagBegin, TagBody, TagEnd, NoTag;
@@ -44,7 +48,7 @@ public class ScribdParser {
 
 
     int chapterIdx = 1;
-    int linkIdx = 1;
+    int linkIdx = 0;
 
     public ScribdParser(int chapterCount) {
         this.chapterCount = chapterCount;
@@ -52,10 +56,8 @@ public class ScribdParser {
 
     public void addContent(String content) {
         Document doc = Jsoup.parse(content);
-        if(buff.length() > 0) {
-            buff.append(String.format("<a name=\"TOC%03d\"/>\n", chapterIdx));
-            chapterIdx++;
-        }
+        buff.append(String.format("<a name=\"TOC%03d\"/>\n", chapterIdx++));
+        if(chapterIdx > firstChapterIdx) newChapter = true;
         Elements textElements =
                 doc.getElementsByAttribute("data-position");
                 //doc.getElementsByClass("text_line");
@@ -104,6 +106,11 @@ public class ScribdParser {
 
 
             if (isLineBreak) {
+                if(newChapter) {
+                    newChapter = false;
+                    toc.add(secBuff.toString());
+                }
+
                 String tag = getParagraphTag(fontSizes);
                 buff.append(String.format("<%s>\n%s</%s>\n", tag, secBuff.toString(), tag));
                 secBuff.delete(0, secBuff.length());
@@ -123,11 +130,11 @@ public class ScribdParser {
 
             if (lastLineEndsWithHyphen) {
                 //Get first word and append it to last line
-                int firstSpaceIdx = text.indexOf(" ");
-                if (firstSpaceIdx == -1) firstSpaceIdx = text.length() -1;
+//                int firstSpaceIdx = text.indexOf(" ");
+//                if (firstSpaceIdx == -1) firstSpaceIdx = text.length() -1;
                 while(secBuff.charAt(secBuff.length() -1) == ' ') secBuff.deleteCharAt(secBuff.length() -1);
-                secBuff.append(text.substring(0, firstSpaceIdx) + "\n");
-                text = text.substring(firstSpaceIdx + 1);
+                secBuff.append(text.trim() + "\n");
+                text = "";
             }
 
             boolean isLink = false;
@@ -148,10 +155,13 @@ public class ScribdParser {
             }
 
             if(!e.children().isEmpty() && e.child(0).hasClass("last_link_part")) {
-                if (linkIdx < chapterCount) {
-                    secBuff.append(String.format("<a href=\"#TOC%03d\">%s</a>", linkIdx++, linkText));
+                if (isTOCProccessed && linkIdx < chapterCount) {
+                    secBuff.append(String.format("<a href=\"#TOC%03d\">%s</a>", firstChapterIdx + linkIdx, linkText));
+                    linkIdx++;
+                    System.out.println("linkIdx = " + linkIdx + "#" + chapterCount);
                 } else {
-                    secBuff.append(String.format("<a href=#>%s</a>", linkText));
+                    //secBuff.append(String.format("<a href=#>%s</a>", linkText));
+                    secBuff.append(String.format("<u>%s</u>", linkText));
                 }
                 isLink = true;
             }
@@ -161,6 +171,11 @@ public class ScribdParser {
             }
 
             if (isLineBreak) {
+                if(newChapter) {
+                    newChapter = false;
+                    toc.add(linkText.toString());
+                }
+
                 String tag = getParagraphTag(fontSizes);
                 buff.append(String.format("<%s>\n%s</%s>\n", tag, secBuff.toString(), tag));
                 secBuff.delete(0, secBuff.length());
@@ -170,6 +185,7 @@ public class ScribdParser {
     }
     private void preUpdateStatus(Element element, boolean mixed) {
         text = element.text();
+        if(text.contains("Content")) isTOCProccessed = true;
         Helper.Debug.println("preU: " + text);
         params = mixed && !element.children().isEmpty() ? parseElement(element.child(0)): parseElement(element);
         if(params.containsKey(STYLE_FONT_SIZE)) {
@@ -281,6 +297,9 @@ public class ScribdParser {
     }
 
     public String getHTML() {
+        for(int i =0; i < toc.size();i++) {
+            System.out.println(String.format("%02d %s", i, toc.get(i)));
+        }
         return buff.toString();
     }
 
@@ -288,7 +307,7 @@ public class ScribdParser {
         Helper.Debug.isDebug = false;
         String bookName = "Frank Lloyd Wright and Mason City - Roy R. Behrens";
         bookName = "Craft Coffee - Jessica Easto and Andreas Willhoff";
-        bookName = "Beginner Calisthenics";
+//        bookName = "Beginner Calisthenics";
 
         String prefix = "Chapter";
 
