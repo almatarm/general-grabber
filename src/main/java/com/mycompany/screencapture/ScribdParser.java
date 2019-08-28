@@ -328,6 +328,8 @@ public class ScribdParser {
         bookName = "Craft Coffee - Jessica Easto and Andreas Willhoff";
 //        bookName = "Beginner Calisthenics";
 
+        BookInfo book = BookInfo.find("Craft Coffee: A Manual: Brewing a Better Cup at Home");
+
         String prefix = "Chapter";
 
         File baseDir = new File(System.getProperty("user.home") + "/Desktop/Scribd/raw/" + bookName);
@@ -394,9 +396,9 @@ public class ScribdParser {
 
             //Generate toc.ncx
             VelocityContext context = new VelocityContext();
-            context.put("uuid", UUID.randomUUID());
+            context.put("uuid", book.uuid);
             context.put("depth", 2);
-            context.put("title", "Hello, World!");
+            context.put("title", book.title);
             context.put("navPoints", new TOCGenerator(5, parser.getTOCList()).getNavPointsTag());
             Helper.iFile.write(new File(oebps, "toc.ncx").getAbsolutePath(), Helper.VelocityTemplate.evaluate("OEBPS/toc.ncx", context));
         } catch (Exception e) {
