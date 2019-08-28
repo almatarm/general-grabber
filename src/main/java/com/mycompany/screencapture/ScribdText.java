@@ -62,7 +62,7 @@ public class ScribdText {
             System.out.println("Ready");
 
             for(int i = 0; i < repeat; i++) {
-                writePageToDisk(renderedSrcX, renderedSrcY, baseDir, String.format("Page %03d.html", start+ i), downloadImages);
+                writePageToDisk(renderedSrcX, renderedSrcY, baseDir, String.format("Page%03d.html", start+ i), downloadImages);
             }
         };
 
@@ -83,7 +83,7 @@ public class ScribdText {
                 Helper.enter();
 
                 Helper.delay(500);
-                writePageToDisk(renderedSrcX, renderedSrcY, baseDir, String.format("Chapter %03d.html", i), downloadImages);
+                writePageToDisk(renderedSrcX, renderedSrcY, baseDir, String.format("Chapter%03d.html", i), downloadImages);
             }
         };
 

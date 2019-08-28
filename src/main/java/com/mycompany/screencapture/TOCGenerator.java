@@ -27,7 +27,7 @@ public class TOCGenerator {
         for(String title : toc) {
             NavPoint np = new NavPoint(
                     String.format("TOC%03d", firstChapterIdx + chapterIdx), title,
-                    String.format("text/Chapter %03d.html", firstChapterIdx + chapterIdx));
+                    String.format("text/Chapter%03d.html", firstChapterIdx + chapterIdx));
             chapterIdx++;
 
             if(level1.contains(title.toLowerCase()) || title.toLowerCase().startsWith("chapter")) {
@@ -51,7 +51,6 @@ public class TOCGenerator {
             buff.append(np.getTags(playOrder));
             playOrder += np.getTotalChildren();
         }
-        System.out.println(buff.toString());
         return buff.toString();
     }
 }

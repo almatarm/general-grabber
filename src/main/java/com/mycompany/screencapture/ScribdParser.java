@@ -7,15 +7,15 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FilenameFilter;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.*;
 
 import static com.mycompany.screencapture.ScribdHtmlParser.FONT_SIZE_H3;
@@ -30,6 +30,7 @@ public class ScribdParser {
     int firstChapterIdx = 5;
     boolean isTOCProccessed = false;
     boolean newChapter = false;
+    String coverImage = null;
     List<String> toc = new ArrayList<>();
 
     enum Status {
@@ -96,6 +97,7 @@ public class ScribdParser {
         String src = img.attr("src");
         String imgFileName = src.substring(src.lastIndexOf("/") +1, src.indexOf("?"));
         buff.append(String.format("\n<img src=\"../images/%s\" height=%s width=%s />\n<br/>\n", imgFileName, img.attr("height"), img.attr("width")));
+        if(coverImage == null) coverImage = imgFileName;
     }
 
     private void processTextOnlyElement(Element element) {
@@ -169,7 +171,6 @@ public class ScribdParser {
                 if (isTOCProccessed && linkIdx < chapterCount) {
                     secBuff.append(String.format("<a href=\"#TOC%03d\">%s</a>", firstChapterIdx + linkIdx, linkText));
                     linkIdx++;
-                    System.out.println("linkIdx = " + linkIdx + "#" + chapterCount);
                 } else {
                     //secBuff.append(String.format("<a href=#>%s</a>", linkText));
                     secBuff.append(String.format("<u>%s</u>", linkText));
@@ -308,9 +309,6 @@ public class ScribdParser {
     }
 
     public String getHTML() {
-        for(int i =0; i < toc.size();i++) {
-            System.out.println(String.format("%02d %s", i, toc.get(i)));
-        }
         return buff.toString();
     }
 
@@ -320,6 +318,10 @@ public class ScribdParser {
 
     public Map<String, StringBuilder> getHtmls() {
         return htmls;
+    }
+
+    public String getCoverImage() {
+        return coverImage;
     }
 
     public static void main(String[] args) {
@@ -343,13 +345,13 @@ public class ScribdParser {
 
         ScribdParser parser = new ScribdParser(pages.size() - 1);
         for (File chapter : pages) {
-            System.out.println(chapter.getAbsolutePath());
-            parser.addContent(chapter.getName(), Helper.iFile.read(chapter.getAbsolutePath()));
+            parser.addContent(chapter.getName().replaceAll(" ", ""), Helper.iFile.read(chapter.getAbsolutePath()));
         }
         String html = parser.getHTML();
 
         try {
             //Creating epub - http://www.jedisaber.com/eBooks/Tutorial.shtml
+            //https://github.com/krisztianmukli/epub-boilerplate/wiki/The-toc.ncx-File
             File epub = new File(baseDir, "epub");
             epub.delete();
             epub.mkdirs();
@@ -377,7 +379,10 @@ public class ScribdParser {
             }));
             for(File file: imagesFiles) {
                 FileUtils.copyFile(file, new File(images, file.getName()));
-            };
+            }
+            //Copy Cover Image
+            FileUtils.copyFile(new File(images, parser.getCoverImage()), new File(images, "cover.jpg"));
+
 
             //copy mimeType
             File mimetype = new File(
@@ -401,6 +406,36 @@ public class ScribdParser {
             context.put("title", book.title);
             context.put("navPoints", new TOCGenerator(5, parser.getTOCList()).getNavPointsTag());
             Helper.iFile.write(new File(oebps, "toc.ncx").getAbsolutePath(), Helper.VelocityTemplate.evaluate("OEBPS/toc.ncx", context));
+
+            //Generate content.opf
+            List<String> chapters = new ArrayList<>();
+            pages.forEach(chapter -> {
+                String name = chapter.getName().replaceAll(" ", "");
+                chapters.add(name.substring(0, name.length() - 5));
+            });
+            context = new VelocityContext();
+            context.put("uuid", book.uuid);
+            context.put("title", book.title);
+            context.put("author", book.author);
+            context.put("chapters", chapters);
+            Helper.iFile.write(new File(oebps, "content.opf").getAbsolutePath(), Helper.VelocityTemplate.evaluate("OEBPS/content.opf", context));
+
+            //Copy Style
+            //Meta-info
+            File styles = new File(
+                    parser.getClass().getClassLoader().getResource("OEBPS/styles").getFile()
+            );
+            FileUtils.copyDirectory(styles, new File(oebps, "styles"));
+
+
+            //create zip script
+            context = new VelocityContext();
+            context.put("title", book.title);
+            File zip = new File(epub, "zip_epub");
+            Helper.iFile.write(zip.getAbsolutePath(), Helper.VelocityTemplate.evaluate("zip_epub", context));
+            Set<PosixFilePermission> permissions = PosixFilePermissions.fromString("rwxr--r--");
+            Files.setPosixFilePermissions(zip.toPath(), permissions);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
