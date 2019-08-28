@@ -14,6 +14,11 @@ public class BookInfo {
                         "dc2958ef-7f8a-4776-9d6e-c43b22782f9b",
                         "Craft Coffee: A Manual: Brewing a Better Cup at Home",
                         "Jessica Easto and Andreas Willhoff"));
+
+        books.put("Beginner Calisthenics", new BookInfo(
+                "61008250-9d65-4ebb-b416-10f7b9d9e98f",
+                "Beginner Calisthenics",
+                "Heather LIndell"));
     }
 
     public static BookInfo find(String bookName) {
