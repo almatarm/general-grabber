@@ -1,5 +1,10 @@
 package com.mycompany.screencapture;
 
+import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.Velocity;
+import org.apache.velocity.app.VelocityEngine;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.*;
@@ -266,6 +271,16 @@ public class Helper {
 
         public static void println(String msg) {
             if(isDebug) System.out.println(msg);
+        }
+    }
+
+    public static class VelocityTemplate {
+        public static String evaluate(String resource, VelocityContext context) {
+            Reader reader = new InputStreamReader( new ScribdText().getClass().getClassLoader()
+                            .getResourceAsStream(resource));
+            StringWriter writer = new StringWriter();
+            Velocity.evaluate(context, writer, "", reader);
+            return writer.toString();
         }
     }
 }

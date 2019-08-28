@@ -1,6 +1,7 @@
 package com.mycompany.screencapture;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.velocity.VelocityContext;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -43,8 +44,9 @@ public class ScribdParser {
     String text;
     Map<String, String> params = new HashMap<>();
     Set<String> fontSizes = new HashSet<>();
-    StringBuilder buff = new StringBuilder();
+    StringBuilder buff = null;
     StringBuilder secBuff = new StringBuilder();
+    Map<String, StringBuilder> htmls = new HashMap<>();
 
 
     int chapterIdx = 1;
@@ -54,7 +56,16 @@ public class ScribdParser {
         this.chapterCount = chapterCount;
     }
 
-    public void addContent(String content) {
+    private StringBuilder getBuffer(String name) {
+        if(htmls.containsKey(name)) {
+            return htmls.get(name);
+        }
+        htmls.put(name, new StringBuilder());
+        return htmls.get(name);
+    }
+
+    public void addContent(String name, String content) {
+        buff = getBuffer(name);
         Document doc = Jsoup.parse(content);
         buff.append(String.format("<a name=\"TOC%03d\"/>\n", chapterIdx++));
         if(chapterIdx > firstChapterIdx) newChapter = true;
@@ -84,7 +95,7 @@ public class ScribdParser {
         Element img = element.getElementsByTag("img").iterator().next();
         String src = img.attr("src");
         String imgFileName = src.substring(src.lastIndexOf("/") +1, src.indexOf("?"));
-        buff.append(String.format("\n<img src=\"images/%s\" height=%s width=%s />\n<br/>\n", imgFileName, img.attr("height"), img.attr("width")));
+        buff.append(String.format("\n<img src=\"../images/%s\" height=%s width=%s />\n<br/>\n", imgFileName, img.attr("height"), img.attr("width")));
     }
 
     private void processTextOnlyElement(Element element) {
@@ -303,6 +314,14 @@ public class ScribdParser {
         return buff.toString();
     }
 
+    public List<String> getTOCList() {
+        return toc;
+    }
+
+    public Map<String, StringBuilder> getHtmls() {
+        return htmls;
+    }
+
     public static void main(String[] args) {
         Helper.Debug.isDebug = false;
         String bookName = "Frank Lloyd Wright and Mason City - Roy R. Behrens";
@@ -323,10 +342,9 @@ public class ScribdParser {
         ScribdParser parser = new ScribdParser(pages.size() - 1);
         for (File chapter : pages) {
             System.out.println(chapter.getAbsolutePath());
-            parser.addContent(Helper.iFile.read(chapter.getAbsolutePath()));
+            parser.addContent(chapter.getName(), Helper.iFile.read(chapter.getAbsolutePath()));
         }
         String html = parser.getHTML();
-
 
         try {
             //Creating epub - http://www.jedisaber.com/eBooks/Tutorial.shtml
@@ -336,7 +354,15 @@ public class ScribdParser {
 
             File oebps = new File(epub, "OEBPS");
             oebps.mkdir();
-            Helper.iFile.write(new File(oebps, "contents.html").getAbsolutePath(), html);
+            File text = new File(oebps, "text");
+            text.mkdir();
+            Map<String, StringBuilder> htmls = parser.getHtmls();
+            for(String fileName: htmls.keySet()) {
+                VelocityContext context = new VelocityContext();
+                context.put("title", fileName);
+                context.put("body", htmls.get(fileName.toString()));
+                Helper.iFile.write(new File(text, fileName).getAbsolutePath(), Helper.VelocityTemplate.evaluate("PageTemplate.html", context));
+            }
 
             //Copy images
             File images = new File(oebps, "images");
@@ -364,9 +390,20 @@ public class ScribdParser {
                     parser.getClass().getClassLoader().getResource("META-INF/container.xml").getFile()
             );
             FileUtils.copyFile(mimetype, new File(metaInfo, "container.xml"));
+
+
+            //Generate toc.ncx
+            VelocityContext context = new VelocityContext();
+            context.put("uuid", UUID.randomUUID());
+            context.put("depth", 2);
+            context.put("title", "Hello, World!");
+            context.put("navPoints", new TOCGenerator(5, parser.getTOCList()).getNavPointsTag());
+            Helper.iFile.write(new File(oebps, "toc.ncx").getAbsolutePath(), Helper.VelocityTemplate.evaluate("OEBPS/toc.ncx", context));
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+
 
 }
