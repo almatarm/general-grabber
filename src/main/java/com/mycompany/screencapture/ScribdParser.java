@@ -353,10 +353,10 @@ public class ScribdParser {
     public static void main(String[] args) {
         Helper.Debug.isDebug = false;
         String bookName = "Frank Lloyd Wright and Mason City - Roy R. Behrens";
-        bookName = "Craft Coffee - Jessica Easto and Andreas Willhoff";
-//        bookName = "Beginner Calisthenics";
+//        bookName = "Craft Coffee - Jessica Easto and Andreas Willhoff";
+        bookName = "Beginner Calisthenics";
 
-        BookInfo book = BookInfo.find("Craft Coffee: A Manual: Brewing a Better Cup at Home");
+        BookInfo book = BookInfo.find("Beginner Calisthenics");
 
         String prefix = "Chapter";
 
@@ -470,6 +470,7 @@ public class ScribdParser {
             Set<PosixFilePermission> permissions = PosixFilePermissions.fromString("rwxr--r--");
             Files.setPosixFilePermissions(zip.toPath(), permissions);
 
+            System.out.println(UUID.randomUUID());
         } catch (Exception e) {
             e.printStackTrace();
         }
