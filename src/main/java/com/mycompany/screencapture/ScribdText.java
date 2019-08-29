@@ -33,6 +33,10 @@ public class ScribdText {
         String bookName = "Frank Lloyd Wright and Mason City - Roy R. Behrens";
         bookName = "Craft Coffee - Jessica Easto and Andreas Willhoff";
 //        bookName = "Beginner Calisthenics";
+        bookName = "Exercise Samples";
+        bookName = "The Good Earth";
+        bookName = "The Elements of Style";
+        bookName = "Requiem for a Dream";
 
 
 
@@ -40,9 +44,9 @@ public class ScribdText {
 
 
 
-        int start = 51;
-        int repeat = 80;
-        boolean downloadImages = false;
+        int start = 1;
+        int repeat =18;
+        boolean downloadImages = true;
 
 //        int renderedSrcX = 1341, renderedSrcY = 85; //Mac
         int renderedSrcX = 3262, renderedSrcY = 88; //Dell Screen
@@ -68,7 +72,7 @@ public class ScribdText {
 
 
         ActionListener parseByChapter = e -> {
-            Helper.delay(500);
+            Helper.delay(5000);
             System.out.println("Ready");
 
             for(int i = start; i <= repeat; i++) {
@@ -82,7 +86,7 @@ public class ScribdText {
                 }
                 Helper.enter();
 
-                Helper.delay(500);
+                Helper.delay(5000);
                 writePageToDisk(renderedSrcX, renderedSrcY, baseDir, String.format("Chapter%03d.html", i), downloadImages);
             }
         };

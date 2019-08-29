@@ -32,6 +32,7 @@ public class ScribdParser {
     boolean newChapter = false;
     String coverImage = null;
     List<String> toc = new ArrayList<>();
+    Map<String, Integer> tocLevels;
 
     enum Status {
         TagBegin, TagBody, TagEnd, NoTag;
@@ -53,8 +54,9 @@ public class ScribdParser {
     int chapterIdx = 1;
     int linkIdx = 0;
 
-    public ScribdParser(int chapterCount) {
+    public ScribdParser(int chapterCount, Map<String, Integer> tocLevels) {
         this.chapterCount = chapterCount;
+        this.tocLevels = tocLevels;
     }
 
     private StringBuilder getBuffer(String name) {
@@ -96,7 +98,18 @@ public class ScribdParser {
         Element img = element.getElementsByTag("img").iterator().next();
         String src = img.attr("src");
         String imgFileName = src.substring(src.lastIndexOf("/") +1, src.indexOf("?"));
-        buff.append(String.format("\n<img src=\"../images/%s\" height=%s width=%s />\n<br/>\n", imgFileName, img.attr("height"), img.attr("width")));
+
+//        buff.append(String.format("\n<img src=\"../images/%s\" height=%s width=%s />\n<br/>\n", imgFileName, img.attr("height"), img.attr("width")));
+        buff.append(String.format(
+                "<div style=\"text-indent:0;text-align:center;margin-right:auto;margin-left:auto;width:99%%;page-break-before:auto;page-break-inside:avoid;page-break-after:auto;\">\n" +
+                "  <div style=\"margin-left:0;margin-right:0;text-align:center;text-indent:0;width:100%%;\">\n" +
+                "    <p style=\"display:inline-block;text-indent:0;width:100%%;\">\n" +
+                "      <img  src=\"../images/%s\" style=\"width:99%%;\" />\n" +
+                "    </p>\n" +
+                "  </div>\n" +
+                "</div>\n",
+                imgFileName
+        ));
         if(coverImage == null) coverImage = imgFileName;
     }
 
@@ -119,12 +132,14 @@ public class ScribdParser {
 
 
             if (isLineBreak) {
+                String tag = null;
                 if(newChapter) {
                     newChapter = false;
                     toc.add(secBuff.toString());
+                    if(tocLevels != null) tag = "h" + tocLevels.get(secBuff.toString());
                 }
 
-                String tag = getParagraphTag(fontSizes);
+                if(tag == null) tag = getParagraphTag(fontSizes);
                 buff.append(String.format("<%s>\n%s</%s>\n", tag, secBuff.toString(), tag));
                 secBuff.delete(0, secBuff.length());
                 fontSizes.clear();
@@ -183,18 +198,27 @@ public class ScribdParser {
             }
 
             if (isLineBreak) {
+                String tag = null;
                 if(newChapter) {
                     newChapter = false;
                     toc.add(linkText.toString());
+                    if(tocLevels != null) {
+                        tag = "h" + tocLevels.get(linkText.toString());
+                        buff.append(String.format("<%s>\n%s</%s>\n", tag, linkText, tag));
+                    }
+
                 }
 
-                String tag = getParagraphTag(fontSizes);
-                buff.append(String.format("<%s>\n%s</%s>\n", tag, secBuff.toString(), tag));
+                if(tag == null) {
+                    tag = getParagraphTag(fontSizes);
+                    buff.append(String.format("<%s>\n%s</%s>\n", tag, secBuff.toString(), tag));
+                }
                 secBuff.delete(0, secBuff.length());
                 fontSizes.clear();
             }
         });
     }
+
     private void preUpdateStatus(Element element, boolean mixed) {
         text = element.text();
         if(text.contains("Content")) isTOCProccessed = true;
@@ -304,6 +328,8 @@ public class ScribdParser {
             if(fontsSizes.iterator().next().equals(FONT_SIZE_H3)) {
                 return "h3";
             }
+            if(!fontsSizes.iterator().next().equals("24"))
+                System.out.println(fontsSizes.iterator().next());
         }
         return "p";
     }
@@ -343,11 +369,18 @@ public class ScribdParser {
         }));
         Collections.sort(pages);
 
-        ScribdParser parser = new ScribdParser(pages.size() - 1);
+        //First Run to get all the links & TOC
+        ScribdParser parser = new ScribdParser(pages.size() - 1, null);
         for (File chapter : pages) {
             parser.addContent(chapter.getName().replaceAll(" ", ""), Helper.iFile.read(chapter.getAbsolutePath()));
         }
-        String html = parser.getHTML();
+        Map<String, Integer> tocLevels = new TOCGenerator(5, parser.getTOCList()).getTocLevels();
+        System.out.println("tocLevels = " + tocLevels);
+        //Second Run to fix TOC
+        parser = new ScribdParser(pages.size() - 1, tocLevels);
+        for (File chapter : pages) {
+            parser.addContent(chapter.getName().replaceAll(" ", ""), Helper.iFile.read(chapter.getAbsolutePath()));
+        }
 
         try {
             //Creating epub - http://www.jedisaber.com/eBooks/Tutorial.shtml
@@ -356,6 +389,7 @@ public class ScribdParser {
             epub.delete();
             epub.mkdirs();
 
+            //write contents
             File oebps = new File(epub, "OEBPS");
             oebps.mkdir();
             File text = new File(oebps, "text");

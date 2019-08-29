@@ -1,8 +1,6 @@
 package com.mycompany.screencapture;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static com.sun.tools.doclint.Entity.le;
 
@@ -12,7 +10,7 @@ import static com.sun.tools.doclint.Entity.le;
 public class TOCGenerator {
     int firstChapterIdx;
     List<String> toc;
-
+    Map<String, Integer> tocLevels = new HashMap<>();
     private List<String> level1 = Arrays.asList("introduction", "chapter", "appendix", "resources", "index", "acknowledgements", "about the author");
 
     public TOCGenerator(int firstChapterIdx, List<String> toc) {
@@ -36,8 +34,10 @@ public class TOCGenerator {
 
             if(activeNp == null) {// && !level1.contains(title.toLowerCase())) {
                 nps.add(np);
+                tocLevels.put(title, 1);
             } else {
                 activeNp.getChildren().add(np);
+                tocLevels.put(title, 2);
             }
 
             if(level1.contains(title.toLowerCase()) || title.toLowerCase().startsWith("chapter")) {
@@ -52,5 +52,10 @@ public class TOCGenerator {
             playOrder += np.getTotalChildren();
         }
         return buff.toString();
+    }
+
+    public Map<String, Integer> getTocLevels() {
+        if (tocLevels.isEmpty()) getNavPointsTag();
+        return tocLevels;
     }
 }
