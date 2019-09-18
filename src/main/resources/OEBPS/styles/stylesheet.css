@@ -18,4 +18,7 @@ h6 { text-align: center; }
 .smcap    {font-variant: small-caps;}
 .u        {text-decoration: underline;}
 .bold     {font-weight: bold;}
+img {
+    text-align: center;
+}
 

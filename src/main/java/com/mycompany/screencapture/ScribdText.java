@@ -37,23 +37,24 @@ public class ScribdText {
         bookName = "The Good Earth";
         bookName = "The Elements of Style";
         bookName = "Requiem for a Dream";
+        bookName = "The World As I See It";
+        bookName = "Intuitive Eating A Revolutionary Program that Works";
+        bookName = "Exercise Medicine Physiological Principles and Clinical Applications";
+        bookName = "Intuitive Eating, 2nd Edition: A Revolutionary Program That Works";
+        bookName = "Intuitive Eating: 30 Intuitive Eating Tips";
+        bookName = "Eat Dirt";
 
-
-
-
-
-
-
-        int start = 1;
-        int repeat =18;
+        int start = 4;
+        int repeat =230;
+        boolean autoPageDetect = true;
         boolean downloadImages = true;
 
 //        int renderedSrcX = 1341, renderedSrcY = 85; //Mac
-        int renderedSrcX = 3262, renderedSrcY = 88; //Dell Screen
-//        int renderedSrcX = 1828, renderedSrcY = 88; //iMac Work
+//        int renderedSrcX = 3262, renderedSrcY = 88; //Dell Screen
+        int renderedSrcX = 1828, renderedSrcY = 88; //iMac Work
 
-        int tocX = 2014, tocY = 131; //Dell Screen
-//        int tocX = 576, tocY = 134; //iMac Work
+//        int tocX = 2014, tocY = 131; //Dell Screen
+        int tocX = 576, tocY = 134; //iMac Work
 
         //Create directory on the desktop
         File baseDir = new File(System.getProperty("user.home") + "/Desktop/Scribd/raw/" + bookName);
@@ -72,22 +73,31 @@ public class ScribdText {
 
 
         ActionListener parseByChapter = e -> {
+            int tocCount = repeat;
+
             Helper.delay(5000);
             System.out.println("Ready");
 
-            for(int i = start; i <= repeat; i++) {
+            if(autoPageDetect) {
+                Helper.Mouse.clickB1(tocX, tocY);
+                String renderedPage = getRenderedPage(renderedSrcX, renderedSrcY);
+                tocCount = getTOCCount(renderedPage);
+                System.out.println("tocCount = " + tocCount);
+                Helper.Mouse.clickB1(tocX, tocY);
+            }
+
+            for(int i = start; i < tocCount; i++) {
                 System.out.println("Chapter " + i);
                 Helper.Mouse.clickB1(tocX, tocY);
-                Helper.delay(500);
+//                Helper.delay(500);
                 Helper.tab();
-                for(int j = 0; j < i -1; j++) {
+                for(int j = 0; j < i; j++) {
                     Helper.arrowDown();
-                    Helper.delay(50);
                 }
                 Helper.enter();
 
                 Helper.delay(5000);
-                writePageToDisk(renderedSrcX, renderedSrcY, baseDir, String.format("Chapter%03d.html", i), downloadImages);
+                writePageToDisk(renderedSrcX, renderedSrcY, baseDir, String.format("Chapter%03d.html", i+1), downloadImages);
             }
         };
 
@@ -122,8 +132,10 @@ public class ScribdText {
                     String imgFileName = src.substring(src.lastIndexOf("/") + 1, src.indexOf("?"));
                     String filePath = new File(baseDir, imgFileName).getAbsolutePath();
                     System.out.println("Downloading... " + url + " -> " + filePath);
-                    Helper.Web.downloadImage(url, filePath);
-                    Helper.delay(5000);
+                    if(!new File(filePath).exists()) {
+                        Helper.Web.downloadImage(url, filePath);
+                        Helper.delay(5000);
+                    }
                 });
                 pageHasImages = !imgs.isEmpty();
             }
@@ -138,4 +150,25 @@ public class ScribdText {
 //        Helper.delay((int) (Math.random() * 20000) + (pageHasImages? 10000: 0));
     }
 
+    private static String getRenderedPage(int renderedSrcX, int renderedSrcY) {
+        Helper.Mouse.clickB1(renderedSrcX, renderedSrcY);
+        Helper.delay(1000);
+        Helper.selectAll();
+        Helper.copy();
+
+        String contents = Helper.ClipBoard.getContent();
+        contents = contents.substring(contents.indexOf("<!DOCTYPE html>"));
+
+        Helper.Chrome.closeTab();
+        Helper.delay(1000);
+        Helper.clickRight();
+
+        return contents;
+    }
+
+
+    private static int getTOCCount(String contents) {
+        Document doc = Jsoup.parse(contents);
+        return doc.getElementsByClass("chapter_title").size();
+    }
 }

@@ -79,8 +79,8 @@ public class ScribdParser {
     }
 
     private void processElement(Element element) {
-        if(!element.getElementsByTag("img").isEmpty()) {
-            processImage(element);
+        if(!element.getElementsByTag("img").isEmpty() && !isMixedElement(element)) {
+            buff.append(processImage(element, true));
         } else if(!isMixedElement(element)) {
             preUpdateStatus(element, false);
             processTextOnlyElement(element);
@@ -94,23 +94,28 @@ public class ScribdParser {
         return !e.children().isEmpty() && e.child(0).hasAttr("data-lineindex");
     }
 
-    private void processImage(Element element) {
+    private String processImage(Element element, boolean lineBreak) {
+        String html;
         Element img = element.getElementsByTag("img").iterator().next();
         String src = img.attr("src");
         String imgFileName = src.substring(src.lastIndexOf("/") +1, src.indexOf("?"));
 
-//        buff.append(String.format("\n<img src=\"../images/%s\" height=%s width=%s />\n<br/>\n", imgFileName, img.attr("height"), img.attr("width")));
-        buff.append(String.format(
-                "<div style=\"text-indent:0;text-align:center;margin-right:auto;margin-left:auto;width:99%%;page-break-before:auto;page-break-inside:avoid;page-break-after:auto;\">\n" +
-                "  <div style=\"margin-left:0;margin-right:0;text-align:center;text-indent:0;width:100%%;\">\n" +
-                "    <p style=\"display:inline-block;text-indent:0;width:100%%;\">\n" +
-                "      <img  src=\"../images/%s\" style=\"width:99%%;\" />\n" +
-                "    </p>\n" +
-                "  </div>\n" +
-                "</div>\n",
-                imgFileName
-        ));
+        if (img.attr("width").trim().isEmpty() || Integer.parseInt(img.attr("width")) <= 280) {
+            html = String.format("\n<img style=\"text-align:center\" src=\"../images/%s\" height=%s width=%s align=\"middle\"/>\n%s\n", imgFileName, img.attr("height"), img.attr("width"), lineBreak? "<br/>" : "");
+        } else {
+            html = String.format(
+                    "<div style=\"text-indent:0;text-align:center;margin-right:auto;margin-left:auto;width:99%%;page-break-before:auto;page-break-inside:avoid;page-break-after:auto;\">\n" +
+                            "  <div style=\"margin-left:0;margin-right:0;text-align:center;text-indent:0;width:100%%;\">\n" +
+                            "    <p style=\"display:inline-block;text-indent:0;width:100%%;\">\n" +
+                            "      <img  src=\"../images/%s\" style=\"width:99%%;\" />\n" +
+                            "    </p>\n" +
+                            "  </div>\n" +
+                            "</div>\n",
+                    imgFileName
+            );
+        }
         if(coverImage == null) coverImage = imgFileName;
+        return html;
     }
 
     private void processTextOnlyElement(Element element) {
@@ -194,7 +199,13 @@ public class ScribdParser {
             }
 
             if (!isLink) {
-                secBuff.append(text + " ");
+                if(e.tag().getName().equals("img")) {
+                    secBuff.append(processImage(e, false));
+                } else {
+                    if(text.contains("&nbsp;")) secBuff.append("<span>");
+                    secBuff.append(text + " ");
+                    if(text.contains("&nbsp;")) secBuff.append("</span>");
+                }
             }
 
             if (isLineBreak) {
@@ -355,8 +366,10 @@ public class ScribdParser {
         String bookName = "Frank Lloyd Wright and Mason City - Roy R. Behrens";
 //        bookName = "Craft Coffee - Jessica Easto and Andreas Willhoff";
         bookName = "Beginner Calisthenics";
+        bookName = "The World As I See It";
+        bookName = "Eat Dirt";
 
-        BookInfo book = BookInfo.find("Beginner Calisthenics");
+        BookInfo book = BookInfo.find("Eat Dirt");
 
         String prefix = "Chapter";
 

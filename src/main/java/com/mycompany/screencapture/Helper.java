@@ -13,8 +13,10 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.*;
 import java.lang.reflect.Field;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -35,7 +37,7 @@ public class Helper {
         }
     }
 
-    public static void delay(int ms) {
+    public static void delay(long ms) {
         try {
             Thread.sleep(ms);
         } catch (InterruptedException e) {
@@ -281,6 +283,18 @@ public class Helper {
             StringWriter writer = new StringWriter();
             Velocity.evaluate(context, writer, "", reader);
             return writer.toString();
+        }
+    }
+
+    public static class Env {
+        public static String getHost() {
+            try {
+                InetAddress addr = InetAddress.getLocalHost();
+                return addr.getHostName();
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            }
+            return null;
         }
     }
 }
