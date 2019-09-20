@@ -30,6 +30,12 @@ public class BookInfo {
                 "Eat Dirt - Why Leaky Gut May Be the Root Cause of Your Health Problems and 5 Surprising Steps to Cure It",
                 "Josh Axe"));
 
+        books.put("How to Talk so Little Kids Will Listen", new BookInfo(
+                "1f44c197-6f3e-41d6-b74a-b715804d36a1",
+                "How to Talk so Little Kids Will Listen: A Survival Guide to Life with Children Ages 2-7",
+                "Joanna Faber and Julie King"));
+
+
     }
 
     public static BookInfo find(String bookName) {

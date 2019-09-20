@@ -368,8 +368,9 @@ public class ScribdParser {
         bookName = "Beginner Calisthenics";
         bookName = "The World As I See It";
         bookName = "Eat Dirt";
+        bookName = "How to Talk so Little Kids Will Listen";
 
-        BookInfo book = BookInfo.find("Eat Dirt");
+        BookInfo book = BookInfo.find(bookName);
 
         String prefix = "Chapter";
 
@@ -447,11 +448,12 @@ public class ScribdParser {
 
 
             //Generate toc.ncx
+            File toc = new File(baseDir, "toc");
             VelocityContext context = new VelocityContext();
             context.put("uuid", book.uuid);
             context.put("depth", 2);
             context.put("title", book.title);
-            context.put("navPoints", new TOCGenerator(5, parser.getTOCList()).getNavPointsTag());
+            context.put("navPoints", new TOCReader(Files.readAllLines(toc.toPath())).getNavPointsTag());
             Helper.iFile.write(new File(oebps, "toc.ncx").getAbsolutePath(), Helper.VelocityTemplate.evaluate("OEBPS/toc.ncx", context));
 
             //Generate content.opf

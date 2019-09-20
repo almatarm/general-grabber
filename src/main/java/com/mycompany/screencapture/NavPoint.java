@@ -10,6 +10,7 @@ public class NavPoint {
     String id;
     String title;
     String src;
+    int level = 1;
 
     List<NavPoint> children = new ArrayList<>();
 
@@ -87,5 +88,13 @@ public class NavPoint {
 
         buff.append(n2);
         return buff.toString();
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public int getLevel() {
+        return level;
     }
 }

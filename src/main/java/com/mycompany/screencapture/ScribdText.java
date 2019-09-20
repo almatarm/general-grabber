@@ -43,18 +43,19 @@ public class ScribdText {
         bookName = "Intuitive Eating, 2nd Edition: A Revolutionary Program That Works";
         bookName = "Intuitive Eating: 30 Intuitive Eating Tips";
         bookName = "Eat Dirt";
+        bookName = "How to Talk so Little Kids Will Listen";
 
-        int start = 4;
+        int start = 6;
         int repeat =230;
         boolean autoPageDetect = true;
         boolean downloadImages = true;
 
 //        int renderedSrcX = 1341, renderedSrcY = 85; //Mac
-//        int renderedSrcX = 3262, renderedSrcY = 88; //Dell Screen
-        int renderedSrcX = 1828, renderedSrcY = 88; //iMac Work
+        int renderedSrcX = 3262, renderedSrcY = 88; //Dell Screen
+//        int renderedSrcX = 1828, renderedSrcY = 88; //iMac Work
 
-//        int tocX = 2014, tocY = 131; //Dell Screen
-        int tocX = 576, tocY = 134; //iMac Work
+        int tocX = 2014, tocY = 131; //Dell Screen
+//        int tocX = 576, tocY = 134; //iMac Work
 
         //Create directory on the desktop
         File baseDir = new File(System.getProperty("user.home") + "/Desktop/Scribd/raw/" + bookName);
@@ -81,7 +82,7 @@ public class ScribdText {
             if(autoPageDetect) {
                 Helper.Mouse.clickB1(tocX, tocY);
                 String renderedPage = getRenderedPage(renderedSrcX, renderedSrcY);
-                tocCount = getTOCCount(renderedPage);
+                tocCount = parseTOCCount(renderedPage, baseDir);
                 System.out.println("tocCount = " + tocCount);
                 Helper.Mouse.clickB1(tocX, tocY);
             }
@@ -167,8 +168,25 @@ public class ScribdText {
     }
 
 
-    private static int getTOCCount(String contents) {
+    private static int parseTOCCount(String contents, File baseDir) {
         Document doc = Jsoup.parse(contents);
-        return doc.getElementsByClass("chapter_title").size();
+        Elements chapterTitles = doc.getElementsByClass("chapter_title");
+        StringBuilder buffWithPages = new StringBuilder();
+        StringBuilder buff = new StringBuilder();
+        for (Element chapterTitle : chapterTitles) {
+            String text = chapterTitle.text();
+            int sIdx = text.lastIndexOf(",");
+            String title = text.substring(0, sIdx).trim();
+            String page  = text.substring(sIdx +1).replace("page", "").trim();
+            buffWithPages.append(String.format("%-10s %s%n", page, title));
+            buff.append(String.format("%s%n", title));
+        }
+        String pagePath = new File(baseDir,"toc").getAbsolutePath();
+        Helper.iFile.write(pagePath, buff.toString());
+
+        pagePath = new File(baseDir,"toc_with_pages").getAbsolutePath();
+        Helper.iFile.write(pagePath, buffWithPages.toString());
+
+        return chapterTitles.size();
     }
 }
