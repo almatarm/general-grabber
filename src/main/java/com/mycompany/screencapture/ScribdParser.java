@@ -100,8 +100,13 @@ public class ScribdParser {
         String src = img.attr("src");
         String imgFileName = src.substring(src.lastIndexOf("/") +1, src.indexOf("?"));
 
-        if (img.attr("width").trim().isEmpty() || Integer.parseInt(img.attr("width")) <= 280) {
-            html = String.format("\n<img style=\"text-align:center\" src=\"../images/%s\" height=%s width=%s align=\"middle\"/>\n%s\n", imgFileName, img.attr("height"), img.attr("width"), lineBreak? "<br/>" : "");
+        int width  = (int) (Integer.parseInt(img.attr("width")) * Constants.RESIZE_RATIO);
+        int height = (int) (Integer.parseInt(img.attr("height")) * Constants.RESIZE_RATIO);
+
+        if(!lineBreak) {
+            html = String.format("\n<img style=\"text-align:center\" src=\"../images/%s\" height=%s width=%s />\n", imgFileName, Integer.parseInt(img.attr("height")), Integer.parseInt(img.attr("width")));
+        } else if (img.attr("width").trim().isEmpty() || width <= Constants.FULL_WIDTH_IMAGE) {
+            html = String.format("\n<center><img style=\"text-align:center\" src=\"../images/%s\" height=%s width=%s align=\"middle\"/>\n</br></center>\n", imgFileName, height, width);
         } else {
             html = String.format(
                     "<div style=\"text-indent:0;text-align:center;margin-right:auto;margin-left:auto;width:99%%;page-break-before:auto;page-break-inside:avoid;page-break-after:auto;\">\n" +
