@@ -142,10 +142,10 @@ public class Helper {
     }
 
     public static void type(int key) {
-        robot.delay(250);
+        robot.delay(50);
         robot.keyPress(key);
         robot.keyRelease(key);
-        robot.delay(250);
+        robot.delay(50);
     }
 
     public static class ClipBoard {

@@ -1,4 +1,5 @@
 #!/bin/bash
 zip -X0 "${title}.epub" mimetype
 zip -rDX9 "${title}.epub" * -x "*.DS_Store" -x mimetype -x zip_epub
-mv "${title}.epub" ../
+mkdir ../dist
+mv "${title}.epub" ../dist/

@@ -44,8 +44,9 @@ public class ScribdText {
         bookName = "Intuitive Eating: 30 Intuitive Eating Tips";
         bookName = "Eat Dirt";
         bookName = "How to Talk so Little Kids Will Listen";
+        bookName = "The Power of Posture";
 
-        int start = 6;
+        int start = 90;
         int repeat =230;
         boolean autoPageDetect = true;
         boolean downloadImages = true;
@@ -63,12 +64,16 @@ public class ScribdText {
         baseDir.mkdirs();
 
 
+        File src = new File(baseDir, "src");
+        src.mkdir();
+
+
         ActionListener parseByPage = e -> {
             Helper.delay(5000);
             System.out.println("Ready");
 
             for(int i = 0; i < repeat; i++) {
-                writePageToDisk(renderedSrcX, renderedSrcY, baseDir, String.format("Page%03d.html", start+ i), downloadImages);
+                writePageToDisk(renderedSrcX, renderedSrcY, src, String.format("Page%03d.html", start+ i), downloadImages);
             }
         };
 
@@ -82,7 +87,7 @@ public class ScribdText {
             if(autoPageDetect) {
                 Helper.Mouse.clickB1(tocX, tocY);
                 String renderedPage = getRenderedPage(renderedSrcX, renderedSrcY);
-                tocCount = parseTOCCount(renderedPage, baseDir);
+                tocCount = parseTOCCount(renderedPage, src);
                 System.out.println("tocCount = " + tocCount);
                 Helper.Mouse.clickB1(tocX, tocY);
             }
@@ -98,7 +103,7 @@ public class ScribdText {
                 Helper.enter();
 
                 Helper.delay(5000);
-                writePageToDisk(renderedSrcX, renderedSrcY, baseDir, String.format("Chapter%03d.html", i+1), downloadImages);
+                writePageToDisk(renderedSrcX, renderedSrcY, src, String.format("Chapter%03d.html", i+1), downloadImages);
             }
         };
 
@@ -168,7 +173,7 @@ public class ScribdText {
     }
 
 
-    private static int parseTOCCount(String contents, File baseDir) {
+    private static int parseTOCCount(String contents, File src) {
         Document doc = Jsoup.parse(contents);
         Elements chapterTitles = doc.getElementsByClass("chapter_title");
         StringBuilder buffWithPages = new StringBuilder();
@@ -181,10 +186,10 @@ public class ScribdText {
             buffWithPages.append(String.format("%-10s %s%n", page, title));
             buff.append(String.format("%s%n", title));
         }
-        String pagePath = new File(baseDir,"toc").getAbsolutePath();
+        String pagePath = new File(src,"toc").getAbsolutePath();
         Helper.iFile.write(pagePath, buff.toString());
 
-        pagePath = new File(baseDir,"toc_with_pages").getAbsolutePath();
+        pagePath = new File(src,"toc_with_pages").getAbsolutePath();
         Helper.iFile.write(pagePath, buffWithPages.toString());
 
         return chapterTitles.size();

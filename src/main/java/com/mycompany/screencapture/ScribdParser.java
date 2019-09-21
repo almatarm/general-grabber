@@ -1,5 +1,6 @@
 package com.mycompany.screencapture;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FileUtils;
 import org.apache.velocity.VelocityContext;
 import org.jsoup.Jsoup;
@@ -7,6 +8,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.awt.print.Book;
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
@@ -49,13 +51,14 @@ public class ScribdParser {
     StringBuilder buff = null;
     StringBuilder secBuff = new StringBuilder();
     Map<String, StringBuilder> htmls = new HashMap<>();
-
+    BookInfo bookInfo;
 
     int chapterIdx = 1;
     int linkIdx = 0;
 
-    public ScribdParser(int chapterCount, Map<String, Integer> tocLevels) {
+    public ScribdParser(int chapterCount, BookInfo bookInfo, Map<String, Integer> tocLevels) {
         this.chapterCount = chapterCount;
+        this.bookInfo = bookInfo;
         this.tocLevels = tocLevels;
     }
 
@@ -100,12 +103,12 @@ public class ScribdParser {
         String src = img.attr("src");
         String imgFileName = src.substring(src.lastIndexOf("/") +1, src.indexOf("?"));
 
-        int width  = (int) (Integer.parseInt(img.attr("width")) * Constants.RESIZE_RATIO);
-        int height = (int) (Integer.parseInt(img.attr("height")) * Constants.RESIZE_RATIO);
+        int width  = (int) (Integer.parseInt(img.attr("width")) * bookInfo.imageResizeFactor);
+        int height = (int) (Integer.parseInt(img.attr("height")) * bookInfo.imageResizeFactor);
 
         if(!lineBreak) {
             html = String.format("\n<img style=\"text-align:center\" src=\"../images/%s\" height=%s width=%s />\n", imgFileName, Integer.parseInt(img.attr("height")), Integer.parseInt(img.attr("width")));
-        } else if (img.attr("width").trim().isEmpty() || width <= Constants.FULL_WIDTH_IMAGE) {
+        } else if (img.attr("width").trim().isEmpty() || width <= bookInfo.fullImageWidth) {
             html = String.format("\n<center><img style=\"text-align:center\" src=\"../images/%s\" height=%s width=%s align=\"middle\"/>\n</br></center>\n", imgFileName, height, width);
         } else {
             html = String.format(
@@ -369,18 +372,19 @@ public class ScribdParser {
     public static void main(String[] args) {
         Helper.Debug.isDebug = false;
         String bookName = "Frank Lloyd Wright and Mason City - Roy R. Behrens";
-//        bookName = "Craft Coffee - Jessica Easto and Andreas Willhoff";
+        bookName = "Craft Coffee - Jessica Easto and Andreas Willhoff";
         bookName = "Beginner Calisthenics";
         bookName = "The World As I See It";
         bookName = "Eat Dirt";
         bookName = "How to Talk so Little Kids Will Listen";
+        bookName = "The Power of Posture";
 
-        BookInfo book = BookInfo.find(bookName);
 
         String prefix = "Chapter";
 
         File baseDir = new File(System.getProperty("user.home") + "/Desktop/Scribd/raw/" + bookName);
-        List<File> pages = Arrays.asList(baseDir.listFiles(new FilenameFilter() {
+        File src = new File(baseDir, "src");
+        List<File> pages = Arrays.asList(src.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
                 return name.contains(prefix);
@@ -388,15 +392,19 @@ public class ScribdParser {
         }));
         Collections.sort(pages);
 
+
+        //Get or Create Book Info
+        BookInfo book = getBookInfo(src, bookName);
+
         //First Run to get all the links & TOC
-        ScribdParser parser = new ScribdParser(pages.size() - 1, null);
+        ScribdParser parser = new ScribdParser(pages.size() - 1, book, null);
         for (File chapter : pages) {
             parser.addContent(chapter.getName().replaceAll(" ", ""), Helper.iFile.read(chapter.getAbsolutePath()));
         }
         Map<String, Integer> tocLevels = new TOCGenerator(5, parser.getTOCList()).getTocLevels();
-        System.out.println("tocLevels = " + tocLevels);
+
         //Second Run to fix TOC
-        parser = new ScribdParser(pages.size() - 1, tocLevels);
+        parser = new ScribdParser(pages.size() - 1, book, tocLevels);
         for (File chapter : pages) {
             parser.addContent(chapter.getName().replaceAll(" ", ""), Helper.iFile.read(chapter.getAbsolutePath()));
         }
@@ -424,7 +432,7 @@ public class ScribdParser {
             //Copy images
             File images = new File(oebps, "images");
             images.mkdir();
-            List<File> imagesFiles = Arrays.asList(baseDir.listFiles(new FileFilter() {
+            List<File> imagesFiles = Arrays.asList(src.listFiles(new FileFilter() {
                 @Override
                 public boolean accept(File file) {
                     return !file.getName().contains("html") && file.isFile();
@@ -453,7 +461,7 @@ public class ScribdParser {
 
 
             //Generate toc.ncx
-            File toc = new File(baseDir, "toc");
+            File toc = new File(src, "toc");
             VelocityContext context = new VelocityContext();
             context.put("uuid", book.uuid);
             context.put("depth", 2);
@@ -490,12 +498,33 @@ public class ScribdParser {
             Set<PosixFilePermission> permissions = PosixFilePermissions.fromString("rwxr--r--");
             Files.setPosixFilePermissions(zip.toPath(), permissions);
 
-            System.out.println(UUID.randomUUID());
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    private static BookInfo getBookInfo(File src, String bookName) {
+        BookInfo bookInfo = null;
+        try {
+            File data = new File(src, "info.json");
+            if (data.exists()) {
+                ObjectMapper mapper = new ObjectMapper();
+                bookInfo = mapper.readValue(data, BookInfo.class);
+            } else {
+                bookInfo = new BookInfo();
+                bookInfo.uuid = UUID.randomUUID().toString();
+                bookInfo.title = bookName;
+                bookInfo.author = "author";
+                bookInfo.fullImageWidth = 400;
+                bookInfo.imageResizeFactor = 0.75f;
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.writeValue(data, bookInfo);
+            }
+        } catch( Exception e) {
+            e.printStackTrace();
+        }
+        return bookInfo;
+    }
 
 
 }
