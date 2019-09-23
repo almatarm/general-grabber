@@ -45,8 +45,12 @@ public class ScribdText {
         bookName = "Eat Dirt";
         bookName = "How to Talk so Little Kids Will Listen";
         bookName = "The Power of Posture";
+        bookName = "Photovoltaic Design and Installation For Dummies";
+        bookName = "Yoga Assists";
+        bookName = "Paleo Workouts For Dummies";
+        bookName = "Song of Kali";
 
-        int start = 90;
+        int start = 0;
         int repeat =230;
         boolean autoPageDetect = true;
         boolean downloadImages = true;

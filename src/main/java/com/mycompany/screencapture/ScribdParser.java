@@ -103,11 +103,11 @@ public class ScribdParser {
         String src = img.attr("src");
         String imgFileName = src.substring(src.lastIndexOf("/") +1, src.indexOf("?"));
 
-        int width  = (int) (Integer.parseInt(img.attr("width")) * bookInfo.imageResizeFactor);
-        int height = (int) (Integer.parseInt(img.attr("height")) * bookInfo.imageResizeFactor);
+        int width  = img.attr("width").trim().isEmpty()  ? 0 : (int) (Integer.parseInt(img.attr("width")) * bookInfo.imageResizeFactor);
+        int height = img.attr("height").trim().isEmpty() ? 0 : (int) (Integer.parseInt(img.attr("height")) * bookInfo.imageResizeFactor);
 
         if(!lineBreak) {
-            html = String.format("\n<img style=\"text-align:center\" src=\"../images/%s\" height=%s width=%s />\n", imgFileName, Integer.parseInt(img.attr("height")), Integer.parseInt(img.attr("width")));
+            html = String.format("\n<img style=\"text-align:center\" src=\"../images/%s\" height=%s width=%s />\n", imgFileName, img.attr("height"), img.attr("width"));
         } else if (img.attr("width").trim().isEmpty() || width <= bookInfo.fullImageWidth) {
             html = String.format("\n<center><img style=\"text-align:center\" src=\"../images/%s\" height=%s width=%s align=\"middle\"/>\n</br></center>\n", imgFileName, height, width);
         } else {
@@ -378,6 +378,10 @@ public class ScribdParser {
         bookName = "Eat Dirt";
         bookName = "How to Talk so Little Kids Will Listen";
         bookName = "The Power of Posture";
+        bookName = "Photovoltaic Design and Installation For Dummies";
+        bookName = "Yoga Assists";
+        bookName = "Paleo Workouts For Dummies";
+        bookName = "Song of Kali";
 
 
         String prefix = "Chapter";
