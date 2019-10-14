@@ -1,0 +1,283 @@
+#/bin/bash
+mkdir -p video
+ffmpeg -i mp4/act_standingbreathcontrol.mp4 -itsoffset 00:00:00.1 -i ogg/act_standingbreathcontrol_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Standing Breath Control.mp4'
+ffmpeg -i mp4/act_dynamicgoddesstwist.mp4 -itsoffset 00:00:00.1 -i ogg/act_dynamicgoddesstwist_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Dynamic Goddess Twist.mp4'
+ffmpeg -i mp4/act_straddlefold.mp4 -itsoffset 00:00:00.1 -i ogg/act_straddlefold_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Straddle Fold.mp4'
+ffmpeg -i mp4/act_twistingstraddlefold.mp4 -itsoffset 00:00:00.1 -i ogg/act_twistingstraddlefold_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Twisting Straddle Fold.mp4'
+ffmpeg -i mp4/act_revolvedlunge1r.mp4 -itsoffset 00:00:00.1 -i ogg/act_revolvedlunge1r_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Revolved Lunge（Right).mp4'
+ffmpeg -i mp4/act_revolvedlunge2l.mp4 -itsoffset 00:00:00.1 -i ogg/act_revolvedlunge2l_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Revolved Lunge（Left).mp4'
+ffmpeg -i mp4/act_standingforwardfold.mp4 -itsoffset 00:00:00.1 -i ogg/act_standingforwardfold_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Standing Forward Fold.mp4'
+ffmpeg -i mp4/act_prayertwistlunge1r.mp4 -itsoffset 00:00:00.1 -i ogg/act_prayertwistlunge1r_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Prayer Twist Lunge（Right).mp4'
+ffmpeg -i mp4/act_prayertwistlunge2l.mp4 -itsoffset 00:00:00.1 -i ogg/act_prayertwistlunge2l_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Prayer Twist Lunge（Left).mp4'
+ffmpeg -i mp4/act_seatedstraddlepose.mp4 -itsoffset 00:00:00.1 -i ogg/act_seatedstraddlepose_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Seated Straddle Pose.mp4'
+ffmpeg -i mp4/act_1leggedforwardfold1r.mp4 -itsoffset 00:00:00.1 -i ogg/act_1leggedforwardfold1r_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/One-legged Forward Fold（Right).mp4'
+ffmpeg -i mp4/act_1leggedforwardfold2l.mp4 -itsoffset 00:00:00.1 -i ogg/act_1leggedforwardfold2l_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/One-legged Forward Fold（Left).mp4'
+ffmpeg -i mp4/act_supinespinaltwist1r.mp4 -itsoffset 00:00:00.1 -i ogg/act_supinespinaltwist1r_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Supine Spinal Twist（Left).mp4'
+ffmpeg -i mp4/act_supinespinaltwist2l.mp4 -itsoffset 00:00:00.1 -i ogg/act_supinespinaltwist2l_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Supine Spinal Twist（Right).mp4'
+ffmpeg -i mp4/act_reclinedboundanglepose.mp4 -itsoffset 00:00:00.1 -i ogg/act_reclinedboundanglepose_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Reclined Bound Angle Pose.mp4'
+ffmpeg -y \
+  -i 'video/Standing Breath Control.mp4' \
+  -i 'video/Dynamic Goddess Twist.mp4' \
+  -i 'video/Straddle Fold.mp4' \
+  -i 'video/Twisting Straddle Fold.mp4' \
+  -i 'video/Revolved Lunge（Right).mp4' \
+  -i 'video/Revolved Lunge（Left).mp4' \
+  -i 'video/Standing Forward Fold.mp4' \
+  -i 'video/Prayer Twist Lunge（Right).mp4' \
+  -i 'video/Prayer Twist Lunge（Left).mp4' \
+  -i 'video/Seated Straddle Pose.mp4' \
+  -i 'video/One-legged Forward Fold（Right).mp4' \
+  -i 'video/One-legged Forward Fold（Left).mp4' \
+  -i 'video/Supine Spinal Twist（Left).mp4' \
+  -i 'video/Supine Spinal Twist（Right).mp4' \
+  -i 'video/Reclined Bound Angle Pose.mp4' \
+  -filter_complex "concat=n=15:v=1:a=1 [outv][outa]" -map "[outv]" -map "[outa]" 'Hunch Back Fix - Lucy - Beginner - Weight Loss - 15 min.mp4' 
+#/bin/bash
+mkdir -p video
+ffmpeg -i mp4/act_breathcontrolpose.mp4 -itsoffset 00:00:00.1 -i ogg/act_breathcontrolpose_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Breath Control in Thunderbolt Pose.mp4'
+ffmpeg -i mp4/act_catandcow.mp4 -itsoffset 00:00:00.1 -i ogg/act_catandcow_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Cat and cow.mp4'
+ffmpeg -i mp4/act_catposevariation.mp4 -itsoffset 00:00:00.1 -i ogg/act_catposevariation_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Cat Pose Variation.mp4'
+ffmpeg -i mp4/act_crossedbalancei1r.mp4 -itsoffset 00:00:00.1 -i ogg/act_crossedbalancei1r_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Crossed Balance I (Right).mp4'
+ffmpeg -i mp4/act_crossedbalancei2l.mp4 -itsoffset 00:00:00.1 -i ogg/act_crossedbalancei2l_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Crossed Balance I (Left).mp4'
+ffmpeg -i mp4/act_downwarddogpose.mp4 -itsoffset 00:00:00.1 -i ogg/act_downwarddogpose_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Downward Dog Pose.mp4'
+ffmpeg -i mp4/act_oneleggeddownwarddogpose1r.mp4 -itsoffset 00:00:00.1 -i ogg/act_oneleggeddownwarddogpose1r_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/One-Legged Downward Dog Pose (Right).mp4'
+ffmpeg -i mp4/act_oneleggeddownwarddogpose2l.mp4 -itsoffset 00:00:00.1 -i ogg/act_oneleggeddownwarddogpose2l_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/One-Legged Downward Dog Pose (Left).mp4'
+ffmpeg -i mp4/act_chairposevariation.mp4 -itsoffset 00:00:00.1 -i ogg/act_chairposevariation_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Chair Pose Variation.mp4'
+ffmpeg -i mp4/act_shoulderstrechinchairpose.mp4 -itsoffset 00:00:00.1 -i ogg/act_shoulderstrechinchairpose_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Shoulder Strech in Chair Pose.mp4'
+ffmpeg -i mp4/act_standingforwardfold.mp4 -itsoffset 00:00:00.1 -i ogg/act_standingforwardfold_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Standing Forward Fold.mp4'
+ffmpeg -i mp4/act_lowlungepose1r.mp4 -itsoffset 00:00:00.1 -i ogg/act_lowlungepose1r_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Low Lunge Pose (Right).mp4'
+ffmpeg -i mp4/act_lowlungepose2l.mp4 -itsoffset 00:00:00.1 -i ogg/act_lowlungepose2l_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Low Lunge Pose (Left).mp4'
+ffmpeg -i mp4/act_crescentpose1r.mp4 -itsoffset 00:00:00.1 -i ogg/act_crescentpose1r_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Crescent Pose (Right).mp4'
+ffmpeg -i mp4/act_crescentpose2l.mp4 -itsoffset 00:00:00.1 -i ogg/act_crescentpose2l_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Crescent Pose (Left).mp4'
+ffmpeg -i mp4/act_extendedchildspose.mp4 -itsoffset 00:00:00.1 -i ogg/act_extendedchildspose_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Extended Child's Pose.mp4'
+ffmpeg -i mp4/act_wreathpose.mp4 -itsoffset 00:00:00.1 -i ogg/act_wreathpose_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Wreath Pose.mp4'
+ffmpeg -i mp4/act_seatedstraddleposition.mp4 -itsoffset 00:00:00.1 -i ogg/act_seatedstraddleposition_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Seated Straddle Position.mp4'
+ffmpeg -i mp4/act_halflordofthefishespose1l.mp4 -itsoffset 00:00:00.1 -i ogg/act_halflordofthefishespose1l_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Half Lord of the Fishes Pose (Left).mp4'
+ffmpeg -i mp4/act_halflordofthefishespose2r.mp4 -itsoffset 00:00:00.1 -i ogg/act_halflordofthefishespose2r_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Half Lord of the Fishes Pose (Right).mp4'
+ffmpeg -i mp4/act_supinespinaltwist1r.mp4 -itsoffset 00:00:00.1 -i ogg/act_supinespinaltwist1r_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Supine Spinal Twist (Left).mp4'
+ffmpeg -i mp4/act_supinespinaltwist2l.mp4 -itsoffset 00:00:00.1 -i ogg/act_supinespinaltwist2l_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Supine Spinal Twist (Right).mp4'
+ffmpeg -i mp4/act_happybabypose.mp4 -itsoffset 00:00:00.1 -i ogg/act_happybabypose_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Happy Baby Pose.mp4'
+ffmpeg -i mp4/act_corpsepose.mp4 -itsoffset 00:00:00.1 -i ogg/act_corpsepose_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Corpse Pose.mp4'
+ffmpeg -y \
+  -i 'video/Standing Breath Control.mp4' \
+  -i 'video/Dynamic Goddess Twist.mp4' \
+  -i 'video/Straddle Fold.mp4' \
+  -i 'video/Twisting Straddle Fold.mp4' \
+  -i 'video/Revolved Lunge（Right).mp4' \
+  -i 'video/Revolved Lunge（Left).mp4' \
+  -i 'video/Standing Forward Fold.mp4' \
+  -i 'video/Prayer Twist Lunge（Right).mp4' \
+  -i 'video/Prayer Twist Lunge（Left).mp4' \
+  -i 'video/Seated Straddle Pose.mp4' \
+  -i 'video/One-legged Forward Fold（Right).mp4' \
+  -i 'video/One-legged Forward Fold（Left).mp4' \
+  -i 'video/Supine Spinal Twist（Left).mp4' \
+  -i 'video/Supine Spinal Twist（Right).mp4' \
+  -i 'video/Reclined Bound Angle Pose.mp4' \
+  -filter_complex "concat=n=15:v=1:a=1 [outv][outa]" -map "[outv]" -map "[outa]" 'Hunch Back Fix - Lucy - Beginner - Weight Loss - 15 min.mp4' 
+  -i 'video/Breath Control in Thunderbolt Pose.mp4' \
+  -i 'video/Cat and cow.mp4' \
+  -i 'video/Cat Pose Variation.mp4' \
+  -i 'video/Crossed Balance I (Right).mp4' \
+  -i 'video/Crossed Balance I (Left).mp4' \
+  -i 'video/Downward Dog Pose.mp4' \
+  -i 'video/One-Legged Downward Dog Pose (Right).mp4' \
+  -i 'video/One-Legged Downward Dog Pose (Left).mp4' \
+  -i 'video/Chair Pose Variation.mp4' \
+  -i 'video/Shoulder Strech in Chair Pose.mp4' \
+  -i 'video/Standing Forward Fold.mp4' \
+  -i 'video/Low Lunge Pose (Right).mp4' \
+  -i 'video/Low Lunge Pose (Left).mp4' \
+  -i 'video/Crescent Pose (Right).mp4' \
+  -i 'video/Crescent Pose (Left).mp4' \
+  -i 'video/Extended Child's Pose.mp4' \
+  -i 'video/Wreath Pose.mp4' \
+  -i 'video/Seated Straddle Position.mp4' \
+  -i 'video/Half Lord of the Fishes Pose (Left).mp4' \
+  -i 'video/Half Lord of the Fishes Pose (Right).mp4' \
+  -i 'video/Supine Spinal Twist (Left).mp4' \
+  -i 'video/Supine Spinal Twist (Right).mp4' \
+  -i 'video/Happy Baby Pose.mp4' \
+  -i 'video/Corpse Pose.mp4' \
+  -filter_complex "concat=n=24:v=1:a=1 [outv][outa]" -map "[outv]" -map "[outa]" 'Back Muscle Strengthening - Lucy - Beginner - Weight Loss - 22 min.mp4' 
+#/bin/bash
+mkdir -p video
+ffmpeg -i mp4/act_breathcontrolpose.mp4 -itsoffset 00:00:00.1 -i ogg/act_breathcontrolpose_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Breath Control in Thunderbolt Pose.mp4'
+ffmpeg -i mp4/act_catandcow.mp4 -itsoffset 00:00:00.1 -i ogg/act_catandcow_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Cat and Cow.mp4'
+ffmpeg -i mp4/act_catposevariation.mp4 -itsoffset 00:00:00.1 -i ogg/act_catposevariation_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Cat Pose Variation.mp4'
+ffmpeg -i mp4/act_sphinxpose.mp4 -itsoffset 00:00:00.1 -i ogg/act_sphinxpose_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Sphinx Pose.mp4'
+ffmpeg -i mp4/act_oneleggedlocustvariation1r.mp4 -itsoffset 00:00:00.1 -i ogg/act_oneleggedlocustvariation1r_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/One-Legged Locust Variation（Right).mp4'
+ffmpeg -i mp4/act_oneleggedlocustvariation2l.mp4 -itsoffset 00:00:00.1 -i ogg/act_oneleggedlocustvariation2l_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/One-Legged Locust Variation（Left).mp4'
+ffmpeg -i mp4/act_fulllocustvariation.mp4 -itsoffset 00:00:00.1 -i ogg/act_fulllocustvariation_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Full Locust Variation.mp4'
+ffmpeg -i mp4/act_upwardfacingdog.mp4 -itsoffset 00:00:00.1 -i ogg/act_upwardfacingdog_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Upward Facing Dog.mp4'
+ffmpeg -i mp4/act_downwardfacingdog.mp4 -itsoffset 00:00:00.1 -i ogg/act_downwardfacingdog_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Downward Facing Dog.mp4'
+ffmpeg -i mp4/act_childspose.mp4 -itsoffset 00:00:00.1 -i ogg/act_childspose_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Child's Pose.mp4'
+ffmpeg -i mp4/act_sidestretchchildspose1r.mp4 -itsoffset 00:00:00.1 -i ogg/act_sidestretchchildspose1r_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Side Stretch Child's Pose (Right).mp4'
+ffmpeg -i mp4/act_sidestretchchildspose2l.mp4 -itsoffset 00:00:00.1 -i ogg/act_sidestretchchildspose2l_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Side Stretch Child's Pose (Left).mp4'
+ffmpeg -i mp4/act_halfboatpose.mp4 -itsoffset 00:00:00.1 -i ogg/act_halfboatpose_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Half Boat Pose.mp4'
+ffmpeg -i mp4/act_boatpose.mp4 -itsoffset 00:00:00.1 -i ogg/act_boatpose_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Boat Pose.mp4'
+ffmpeg -i mp4/act_seatedforwardfold.mp4 -itsoffset 00:00:00.1 -i ogg/act_seatedforwardfold_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Seated Forward Fold.mp4'
+ffmpeg -i mp4/act_supinespinaltwist1r.mp4 -itsoffset 00:00:00.1 -i ogg/act_supinespinaltwist1r_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Supine Spinal Twist（Left).mp4'
+ffmpeg -i mp4/act_supinespinaltwist2l.mp4 -itsoffset 00:00:00.1 -i ogg/act_supinespinaltwist2l_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Supine Spinal Twist（Right).mp4'
+ffmpeg -i mp4/act_supinelowbackmassage.mp4 -itsoffset 00:00:00.1 -i ogg/act_supinelowbackmassage_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Supine Low Back Massage.mp4'
+ffmpeg -i mp4/act_reclinedboundanglepose.mp4 -itsoffset 00:00:00.1 -i ogg/act_reclinedboundanglepose_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Reclined Bound Angle Pose.mp4'
+ffmpeg -i mp4/act_corpsepose.mp4 -itsoffset 00:00:00.1 -i ogg/act_corpsepose_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Corpse Pose.mp4'
+ffmpeg -y \
+  -i 'video/Standing Breath Control.mp4' \
+  -i 'video/Dynamic Goddess Twist.mp4' \
+  -i 'video/Straddle Fold.mp4' \
+  -i 'video/Twisting Straddle Fold.mp4' \
+  -i 'video/Revolved Lunge（Right).mp4' \
+  -i 'video/Revolved Lunge（Left).mp4' \
+  -i 'video/Standing Forward Fold.mp4' \
+  -i 'video/Prayer Twist Lunge（Right).mp4' \
+  -i 'video/Prayer Twist Lunge（Left).mp4' \
+  -i 'video/Seated Straddle Pose.mp4' \
+  -i 'video/One-legged Forward Fold（Right).mp4' \
+  -i 'video/One-legged Forward Fold（Left).mp4' \
+  -i 'video/Supine Spinal Twist（Left).mp4' \
+  -i 'video/Supine Spinal Twist（Right).mp4' \
+  -i 'video/Reclined Bound Angle Pose.mp4' \
+  -filter_complex "concat=n=15:v=1:a=1 [outv][outa]" -map "[outv]" -map "[outa]" 'Hunch Back Fix - Lucy - Beginner - Weight Loss - 15 min.mp4' 
+  -i 'video/Breath Control in Thunderbolt Pose.mp4' \
+  -i 'video/Cat and cow.mp4' \
+  -i 'video/Cat Pose Variation.mp4' \
+  -i 'video/Crossed Balance I (Right).mp4' \
+  -i 'video/Crossed Balance I (Left).mp4' \
+  -i 'video/Downward Dog Pose.mp4' \
+  -i 'video/One-Legged Downward Dog Pose (Right).mp4' \
+  -i 'video/One-Legged Downward Dog Pose (Left).mp4' \
+  -i 'video/Chair Pose Variation.mp4' \
+  -i 'video/Shoulder Strech in Chair Pose.mp4' \
+  -i 'video/Standing Forward Fold.mp4' \
+  -i 'video/Low Lunge Pose (Right).mp4' \
+  -i 'video/Low Lunge Pose (Left).mp4' \
+  -i 'video/Crescent Pose (Right).mp4' \
+  -i 'video/Crescent Pose (Left).mp4' \
+  -i 'video/Extended Child's Pose.mp4' \
+  -i 'video/Wreath Pose.mp4' \
+  -i 'video/Seated Straddle Position.mp4' \
+  -i 'video/Half Lord of the Fishes Pose (Left).mp4' \
+  -i 'video/Half Lord of the Fishes Pose (Right).mp4' \
+  -i 'video/Supine Spinal Twist (Left).mp4' \
+  -i 'video/Supine Spinal Twist (Right).mp4' \
+  -i 'video/Happy Baby Pose.mp4' \
+  -i 'video/Corpse Pose.mp4' \
+  -filter_complex "concat=n=24:v=1:a=1 [outv][outa]" -map "[outv]" -map "[outa]" 'Back Muscle Strengthening - Lucy - Beginner - Weight Loss - 22 min.mp4' 
+  -i 'video/Breath Control in Thunderbolt Pose.mp4' \
+  -i 'video/Cat and Cow.mp4' \
+  -i 'video/Cat Pose Variation.mp4' \
+  -i 'video/Sphinx Pose.mp4' \
+  -i 'video/One-Legged Locust Variation（Right).mp4' \
+  -i 'video/One-Legged Locust Variation（Left).mp4' \
+  -i 'video/Full Locust Variation.mp4' \
+  -i 'video/Upward Facing Dog.mp4' \
+  -i 'video/Downward Facing Dog.mp4' \
+  -i 'video/Child's Pose.mp4' \
+  -i 'video/Side Stretch Child's Pose (Right).mp4' \
+  -i 'video/Side Stretch Child's Pose (Left).mp4' \
+  -i 'video/Half Boat Pose.mp4' \
+  -i 'video/Boat Pose.mp4' \
+  -i 'video/Seated Forward Fold.mp4' \
+  -i 'video/Supine Spinal Twist（Left).mp4' \
+  -i 'video/Supine Spinal Twist（Right).mp4' \
+  -i 'video/Supine Low Back Massage.mp4' \
+  -i 'video/Reclined Bound Angle Pose.mp4' \
+  -i 'video/Corpse Pose.mp4' \
+  -filter_complex "concat=n=20:v=1:a=1 [outv][outa]" -map "[outv]" -map "[outa]" 'Back Power Building - Lucy - Beginner - Weight Loss - 18 min.mp4' 
+#/bin/bash
+mkdir -p video
+ffmpeg -i mp4/act_breathcontrolinthunderbolt.mp4 -itsoffset 00:00:00.1 -i ogg/act_breathcontrolinthunderbolt_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Breath Control in Thunderbolt.mp4'
+ffmpeg -i mp4/act_downwarddogpose.mp4 -itsoffset 00:00:00.1 -i ogg/act_downwarddogpose_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Downward Dog Pose.mp4'
+ffmpeg -i mp4/act_sideplankpose1r.mp4 -itsoffset 00:00:00.1 -i ogg/act_sideplankpose1r_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Side Plank Pose (Right).mp4'
+ffmpeg -i mp4/act_sideplankpose2l.mp4 -itsoffset 00:00:00.1 -i ogg/act_sideplankpose2l_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Side Plank Pose (Left).mp4'
+ffmpeg -i mp4/act_reversegatepose1l.mp4 -itsoffset 00:00:00.1 -i ogg/act_reversegatepose1l_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Reverse Gate Pose(Left).mp4'
+ffmpeg -i mp4/act_reversegatepose2r.mp4 -itsoffset 00:00:00.1 -i ogg/act_reversegatepose2r_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Reverse Gate Pose (Right).mp4'
+ffmpeg -i mp4/act_trianglepose1r.mp4 -itsoffset 00:00:00.1 -i ogg/act_trianglepose1r_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Triangle Pose (Right).mp4'
+ffmpeg -i mp4/act_sideanglepose1r.mp4 -itsoffset 00:00:00.1 -i ogg/act_sideanglepose1r_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Side Angle Pose (Right).mp4'
+ffmpeg -i mp4/act_trianglepose2l.mp4 -itsoffset 00:00:00.1 -i ogg/act_trianglepose2l_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Triangle Pose (Left).mp4'
+ffmpeg -i mp4/act_sideanglepose2l.mp4 -itsoffset 00:00:00.1 -i ogg/act_sideanglepose2l_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Side Angle Pose (Left).mp4'
+ffmpeg -i mp4/act_extendedgatepose1l.mp4 -itsoffset 00:00:00.1 -i ogg/act_extendedgatepose1l_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Extended Gate Pose (Left).mp4'
+ffmpeg -i mp4/act_extendedgatepose2r.mp4 -itsoffset 00:00:00.1 -i ogg/act_extendedgatepose2r_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Extended Gate Pose (Right).mp4'
+ffmpeg -i mp4/act_supinespinaltwist1l.mp4 -itsoffset 00:00:00.1 -i ogg/act_supinespinaltwist1l_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Supine Spinal Twist (Left).mp4'
+ffmpeg -i mp4/act_supinespinaltwist2r.mp4 -itsoffset 00:00:00.1 -i ogg/act_supinespinaltwist2r_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Supine Spinal Twist (Right).mp4'
+ffmpeg -i mp4/act_corpsepose.mp4 -itsoffset 00:00:00.1 -i ogg/act_corpsepose_start.ogg -c:v copy -c:a aac -sstrict experimental 'video/Corpse Pose.mp4'
+ffmpeg -y \
+  -i 'video/Standing Breath Control.mp4' \
+  -i 'video/Dynamic Goddess Twist.mp4' \
+  -i 'video/Straddle Fold.mp4' \
+  -i 'video/Twisting Straddle Fold.mp4' \
+  -i 'video/Revolved Lunge（Right).mp4' \
+  -i 'video/Revolved Lunge（Left).mp4' \
+  -i 'video/Standing Forward Fold.mp4' \
+  -i 'video/Prayer Twist Lunge（Right).mp4' \
+  -i 'video/Prayer Twist Lunge（Left).mp4' \
+  -i 'video/Seated Straddle Pose.mp4' \
+  -i 'video/One-legged Forward Fold（Right).mp4' \
+  -i 'video/One-legged Forward Fold（Left).mp4' \
+  -i 'video/Supine Spinal Twist（Left).mp4' \
+  -i 'video/Supine Spinal Twist（Right).mp4' \
+  -i 'video/Reclined Bound Angle Pose.mp4' \
+  -filter_complex "concat=n=15:v=1:a=1 [outv][outa]" -map "[outv]" -map "[outa]" 'Hunch Back Fix - Lucy - Beginner - Weight Loss - 15 min.mp4' 
+  -i 'video/Breath Control in Thunderbolt Pose.mp4' \
+  -i 'video/Cat and cow.mp4' \
+  -i 'video/Cat Pose Variation.mp4' \
+  -i 'video/Crossed Balance I (Right).mp4' \
+  -i 'video/Crossed Balance I (Left).mp4' \
+  -i 'video/Downward Dog Pose.mp4' \
+  -i 'video/One-Legged Downward Dog Pose (Right).mp4' \
+  -i 'video/One-Legged Downward Dog Pose (Left).mp4' \
+  -i 'video/Chair Pose Variation.mp4' \
+  -i 'video/Shoulder Strech in Chair Pose.mp4' \
+  -i 'video/Standing Forward Fold.mp4' \
+  -i 'video/Low Lunge Pose (Right).mp4' \
+  -i 'video/Low Lunge Pose (Left).mp4' \
+  -i 'video/Crescent Pose (Right).mp4' \
+  -i 'video/Crescent Pose (Left).mp4' \
+  -i 'video/Extended Child's Pose.mp4' \
+  -i 'video/Wreath Pose.mp4' \
+  -i 'video/Seated Straddle Position.mp4' \
+  -i 'video/Half Lord of the Fishes Pose (Left).mp4' \
+  -i 'video/Half Lord of the Fishes Pose (Right).mp4' \
+  -i 'video/Supine Spinal Twist (Left).mp4' \
+  -i 'video/Supine Spinal Twist (Right).mp4' \
+  -i 'video/Happy Baby Pose.mp4' \
+  -i 'video/Corpse Pose.mp4' \
+  -filter_complex "concat=n=24:v=1:a=1 [outv][outa]" -map "[outv]" -map "[outa]" 'Back Muscle Strengthening - Lucy - Beginner - Weight Loss - 22 min.mp4' 
+  -i 'video/Breath Control in Thunderbolt Pose.mp4' \
+  -i 'video/Cat and Cow.mp4' \
+  -i 'video/Cat Pose Variation.mp4' \
+  -i 'video/Sphinx Pose.mp4' \
+  -i 'video/One-Legged Locust Variation（Right).mp4' \
+  -i 'video/One-Legged Locust Variation（Left).mp4' \
+  -i 'video/Full Locust Variation.mp4' \
+  -i 'video/Upward Facing Dog.mp4' \
+  -i 'video/Downward Facing Dog.mp4' \
+  -i 'video/Child's Pose.mp4' \
+  -i 'video/Side Stretch Child's Pose (Right).mp4' \
+  -i 'video/Side Stretch Child's Pose (Left).mp4' \
+  -i 'video/Half Boat Pose.mp4' \
+  -i 'video/Boat Pose.mp4' \
+  -i 'video/Seated Forward Fold.mp4' \
+  -i 'video/Supine Spinal Twist（Left).mp4' \
+  -i 'video/Supine Spinal Twist（Right).mp4' \
+  -i 'video/Supine Low Back Massage.mp4' \
+  -i 'video/Reclined Bound Angle Pose.mp4' \
+  -i 'video/Corpse Pose.mp4' \
+  -filter_complex "concat=n=20:v=1:a=1 [outv][outa]" -map "[outv]" -map "[outa]" 'Back Power Building - Lucy - Beginner - Weight Loss - 18 min.mp4' 
+  -i 'video/Breath Control in Thunderbolt.mp4' \
+  -i 'video/Downward Dog Pose.mp4' \
+  -i 'video/Side Plank Pose (Right).mp4' \
+  -i 'video/Side Plank Pose (Left).mp4' \
+  -i 'video/Reverse Gate Pose(Left).mp4' \
+  -i 'video/Reverse Gate Pose (Right).mp4' \
+  -i 'video/Triangle Pose (Right).mp4' \
+  -i 'video/Side Angle Pose (Right).mp4' \
+  -i 'video/Triangle Pose (Left).mp4' \
+  -i 'video/Side Angle Pose (Left).mp4' \
+  -i 'video/Extended Gate Pose (Left).mp4' \
+  -i 'video/Extended Gate Pose (Right).mp4' \
+  -i 'video/Supine Spinal Twist (Left).mp4' \
+  -i 'video/Supine Spinal Twist (Right).mp4' \
+  -i 'video/Corpse Pose.mp4' \
+  -filter_complex "concat=n=15:v=1:a=1 [outv][outa]" -map "[outv]" -map "[outa]" 'Full Back Toner - Lucy - Beginner - Weight Loss - 15 min.mp4' 
