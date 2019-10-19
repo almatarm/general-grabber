@@ -34,5 +34,18 @@
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.10.0.pr3" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.10.0.pr3" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-core:2.10.0.pr3" level="project" />
+    <orderEntry type="library" name="Maven: com.almatarm:SmallUtil:1.0.1" level="project" />
+    <orderEntry type="library" name="Maven: org.htmlparser:htmlparser:2.1" level="project" />
+    <orderEntry type="library" name="Maven: org.htmlparser:htmllexer:2.1" level="project" />
+    <orderEntry type="library" name="Maven: org.blinkenlights.jid3:JID3:0.46" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient:4.2.1" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.2.1" level="project" />
+    <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.6" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.httpcomponents:fluent-hc:4.2-alpha1" level="project" />
+    <orderEntry type="library" name="Maven: org.swinglabs:swing-layout:1.0.3" level="project" />
+    <orderEntry type="library" name="Maven: com.itextpdf:itextpdf:5.4.0" level="project" />
+    <orderEntry type="library" name="Maven: org.bouncycastle:bcprov-jdk15on:1.48" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.commons:commons-math:2.2" level="project" />
+    <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.3" level="project" />
   </component>
 </module>

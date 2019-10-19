@@ -50,6 +50,11 @@
             <artifactId>jackson-databind</artifactId>
             <version>LATEST</version>
         </dependency>
+        <dependency>
+            <groupId>com.almatarm</groupId>
+            <artifactId>SmallUtil</artifactId>
+            <version>1.0.1</version>
+        </dependency>
 
     </dependencies>
 </project>
