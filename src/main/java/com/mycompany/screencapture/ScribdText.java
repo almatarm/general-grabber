@@ -35,22 +35,22 @@ public class ScribdText {
         String bookName = "Frank Lloyd Wright and Mason City - Roy R. Behrens";
         bookName = "Craft Coffee - Jessica Easto and Andreas Willhoff";
 //        bookName = "Beginner Calisthenics";
-        bookName = "Exercise Samples";
-        bookName = "The Good Earth";
-        bookName = "The Elements of Style";
-        bookName = "Requiem for a Dream";
-        bookName = "The World As I See It";
-        bookName = "Intuitive Eating A Revolutionary Program that Works";
-        bookName = "Exercise Medicine Physiological Principles and Clinical Applications";
-        bookName = "Intuitive Eating, 2nd Edition: A Revolutionary Program That Works";
-        bookName = "Intuitive Eating: 30 Intuitive Eating Tips";
-        bookName = "Eat Dirt";
-        bookName = "How to Talk so Little Kids Will Listen";
-        bookName = "The Power of Posture";
-        bookName = "Photovoltaic Design and Installation For Dummies";
-        bookName = "Yoga Assists";
-        bookName = "Paleo Workouts For Dummies";
-        bookName = "Song of Kali";
+//        bookName = "Exercise Samples";
+//        bookName = "The Good Earth";
+//        bookName = "The Elements of Style";
+//        bookName = "Requiem for a Dream";
+//        bookName = "The World As I See It";
+//        bookName = "Intuitive Eating A Revolutionary Program that Works";
+//        bookName = "Exercise Medicine Physiological Principles and Clinical Applications";
+//        bookName = "Intuitive Eating, 2nd Edition: A Revolutionary Program That Works";
+//        bookName = "Intuitive Eating: 30 Intuitive Eating Tips";
+//        bookName = "Eat Dirt";
+//        bookName = "How to Talk so Little Kids Will Listen";
+//        bookName = "The Power of Posture";
+//        bookName = "Photovoltaic Design and Installation For Dummies";
+//        bookName = "Yoga Assists";
+//        bookName = "Paleo Workouts For Dummies";
+//        bookName = "Song of Kali";
 
         AppSettings settings = new AppSettings("Scribd");
         Configuration config = settings.getAppConfiguration();
@@ -66,6 +66,7 @@ public class ScribdText {
         int repeat =230;
         boolean autoPageDetect = true;
         boolean downloadImages = true;
+        boolean tocOnly = true;
 
         int renderedSrcX = config.getInt("renderedSrcX");
         int renderedSrcY = config.getInt("renderedSrcY");
@@ -108,6 +109,7 @@ public class ScribdText {
                 tocCount = parseTOCCount(renderedPage, src);
                 System.out.println("tocCount = " + tocCount);
                 Helper.Mouse.clickB1(tocX, tocY);
+                if(tocOnly) System.exit(0);
             }
 
             for(int i = start; i < tocCount; i++) {
