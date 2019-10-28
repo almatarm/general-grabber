@@ -1,6 +1,8 @@
 package com.mycompany.screencapture;
 
 
+import com.almatarm.app.common.AppSettings;
+import org.apache.commons.configuration2.Configuration;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -50,20 +52,32 @@ public class ScribdText {
         bookName = "Paleo Workouts For Dummies";
         bookName = "Song of Kali";
 
+        AppSettings settings = new AppSettings("Scribd");
+        Configuration config = settings.getAppConfiguration();
+
+//        config.addProperty("renderedSrcX", 3262);
+//        config.addProperty("renderedSrcY", 88);
+//        config.addProperty("tocX", 2014);
+//        config.addProperty("tocY", 88);
+//        config.addProperty("books_dir", "Sync/Scribd Books");
+//        settings.save();
+
         int start = 0;
         int repeat =230;
         boolean autoPageDetect = true;
         boolean downloadImages = true;
 
-//        int renderedSrcX = 1341, renderedSrcY = 85; //Mac
-        int renderedSrcX = 3262, renderedSrcY = 88; //Dell Screen
-//        int renderedSrcX = 1828, renderedSrcY = 88; //iMac Work
+        int renderedSrcX = config.getInt("renderedSrcX");
+        int renderedSrcY = config.getInt("renderedSrcY");
+        int tocX = config.getInt("tocX");
+        int tocY = config.getInt("tocY");
 
-        int tocX = 2014, tocY = 131; //Dell Screen
+//        int renderedSrcX = 1828, renderedSrcY = 88; //iMac Work
 //        int tocX = 576, tocY = 134; //iMac Work
 
         //Create directory on the desktop
-        File baseDir = new File(System.getProperty("user.home") + "/Desktop/Scribd/raw/" + bookName);
+        File baseDir = new File(System.getProperty("user.home") + "/"
+                + config.getString("books_dir") + "/" + bookName);
         System.out.println(baseDir);
         baseDir.mkdirs();
 

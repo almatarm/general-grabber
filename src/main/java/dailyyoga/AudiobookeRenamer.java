@@ -8,17 +8,24 @@ import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.bouncycastle.asn1.x500.style.RFC4519Style.name;
+
 /**
  * Created by almatarm on 10/10/2019.
  */
 public class AudiobookeRenamer {
     public static void main(String[] args) throws ID3Exception {
         File dir = new File("/Users/almatarm/Documents/Book");
+        int firstTrack = 1;
         File[] files = dir.listFiles();
         for(File file : files) {
-
+            if(file.getName().equals(".DS_Store")) {
+                System.out.println("Deleting .DS_STORE");
+                file.delete();
+                continue;
+            }
             String name = file.getName();
-            String pattern = "(\\d\\d).*";
+            String pattern = "(\\d+).*";
             // Create a Pattern object
             Pattern r = Pattern.compile(pattern);
 
@@ -26,8 +33,8 @@ public class AudiobookeRenamer {
             Matcher m = r.matcher(name);
 
             if (m.find()) {
-                int track =  Integer.parseInt(m.group(1).trim());
-                String name2 = String.format("%02d Chapter %02d.mp3",
+                int track =  Integer.parseInt(m.group(1).trim()) + (firstTrack - 1);
+                String name2 = String.format("%03d Chapter %03d.mp3",
                         track, track);
                 System.out.println(name + " -> " + name2);
 
