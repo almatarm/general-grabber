@@ -1,9 +1,7 @@
 package com.mycompany.screencapture;
 
-import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
-import org.apache.velocity.app.VelocityEngine;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,13 +10,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.*;
-import java.lang.reflect.Field;
 import java.net.InetAddress;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -278,7 +273,7 @@ public class Helper {
 
     public static class VelocityTemplate {
         public static String evaluate(String resource, VelocityContext context) {
-            Reader reader = new InputStreamReader( new ScribdText().getClass().getClassLoader()
+            Reader reader = new InputStreamReader( new ScribdWebBookGrapper().getClass().getClassLoader()
                             .getResourceAsStream(resource));
             StringWriter writer = new StringWriter();
             Velocity.evaluate(context, writer, "", reader);

@@ -1,37 +1,36 @@
 package com.mycompany.screencapture;
 
+import com.almatarm.app.common.AppSettings;
+import com.almatarm.lego.io.Exec;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.velocity.VelocityContext;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.awt.print.Book;
 import java.io.*;
-import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.*;
 
 import static com.mycompany.screencapture.ScribdHtmlParser.FONT_SIZE_H3;
-import static java.nio.file.StandardCopyOption.*;
 
 /**
  * Created by almatarm on 24/08/2019.
  */
-public class ScribdParser {
+public class ScribdBookParser {
 
     int chapterCount;
     int firstChapterIdx = 5;
     boolean isTOCProccessed = false;
     boolean newChapter = false;
+    boolean isChapterHeadingANumber = false;
+    int elementsProccessedAfterHeading = 0;
     String coverImage = null;
     List<String> toc = new ArrayList<>();
     Map<String, Integer> tocLevels;
@@ -56,7 +55,7 @@ public class ScribdParser {
     int chapterIdx = 1;
     int linkIdx = 0;
 
-    public ScribdParser(int chapterCount, BookInfo bookInfo, Map<String, Integer> tocLevels) {
+    public ScribdBookParser(int chapterCount, BookInfo bookInfo, Map<String, Integer> tocLevels) {
         this.chapterCount = chapterCount;
         this.bookInfo = bookInfo;
         this.tocLevels = tocLevels;
@@ -82,6 +81,7 @@ public class ScribdParser {
     }
 
     private void processElement(Element element) {
+        elementsProccessedAfterHeading++;
         if(!element.getElementsByTag("img").isEmpty() && !isMixedElement(element)) {
             buff.append(processImage(element, true));
         } else if(!isMixedElement(element)) {
@@ -91,6 +91,9 @@ public class ScribdParser {
             processMixedElement(element);
         }
         postUpdateStatus(element);
+        if(elementsProccessedAfterHeading > 1) {
+            isChapterHeadingANumber = false;
+        }
     }
 
     private boolean isMixedElement(Element e) {
@@ -133,7 +136,8 @@ public class ScribdParser {
                 //Get first word and append it to last line
                 int firstSpaceIdx = text.indexOf(" ");
                 if (firstSpaceIdx == -1) firstSpaceIdx = text.length() -1;
-                while(secBuff.charAt(secBuff.length() -1) == ' ') secBuff.deleteCharAt(secBuff.length() -1);
+
+                while(secBuff.length() > 0 && secBuff.charAt(secBuff.length() -1) == ' ') secBuff.deleteCharAt(secBuff.length() -1);
                 secBuff.append(text.substring(0, firstSpaceIdx) + "\n");
                 text = text.substring(firstSpaceIdx + 1);
             }
@@ -199,6 +203,9 @@ public class ScribdParser {
                 if (isTOCProccessed && linkIdx < chapterCount) {
                     secBuff.append(String.format("<a href=\"#TOC%03d\">%s</a>", firstChapterIdx + linkIdx, linkText));
                     linkIdx++;
+                } else if(isChapterHeadingANumber) {
+                    secBuff.append(String.format("<h1>%s</h1>", linkText));
+                    if(elementsProccessedAfterHeading > 0) isChapterHeadingANumber = false;
                 } else {
                     //secBuff.append(String.format("<a href=#>%s</a>", linkText));
                     secBuff.append(String.format("<u>%s</u>", linkText));
@@ -240,6 +247,10 @@ public class ScribdParser {
 
     private void preUpdateStatus(Element element, boolean mixed) {
         text = element.text();
+        if(NumberUtils.isNumber(text.trim()) && buff.length() == 19 && tocLevels != null) {
+            isChapterHeadingANumber = true;
+            elementsProccessedAfterHeading = 0;
+        }
         if(text.contains("Content")) isTOCProccessed = true;
         Helper.Debug.println("preU: " + text);
         params = mixed && !element.children().isEmpty() ? parseElement(element.child(0)): parseElement(element);
@@ -371,22 +382,20 @@ public class ScribdParser {
 
     public static void main(String[] args) {
         Helper.Debug.isDebug = false;
-        String bookName = "Frank Lloyd Wright and Mason City - Roy R. Behrens";
-        bookName = "Craft Coffee - Jessica Easto and Andreas Willhoff";
-        bookName = "Beginner Calisthenics";
-        bookName = "The World As I See It";
-        bookName = "Eat Dirt";
-        bookName = "How to Talk so Little Kids Will Listen";
-        bookName = "The Power of Posture";
-        bookName = "Photovoltaic Design and Installation For Dummies";
-        bookName = "Yoga Assists";
-        bookName = "Paleo Workouts For Dummies";
-        bookName = "Song of Kali";
 
+//        names.forEach(bookName -> processBook(bookName));
+        processBook(Books.getLastName());
+    }
 
+    private static void processBook(String bookName) {
         String prefix = "Chapter";
 
-        File baseDir = new File(System.getProperty("user.home") + "/Desktop/Scribd/raw/" + bookName);
+        AppSettings settings = new AppSettings("Scribd");
+        Configuration config = settings.getAppConfiguration();
+
+        File baseDir = new File(System.getProperty("user.home") + "/"
+                + config.getString("books_dir") + "/" + bookName);
+        System.out.println(baseDir.getAbsolutePath());
         File src = new File(baseDir, "src");
         List<File> pages = Arrays.asList(src.listFiles(new FilenameFilter() {
             @Override
@@ -401,14 +410,14 @@ public class ScribdParser {
         BookInfo book = getBookInfo(src, bookName);
 
         //First Run to get all the links & TOC
-        ScribdParser parser = new ScribdParser(pages.size() - 1, book, null);
+        ScribdBookParser parser = new ScribdBookParser(pages.size() - 1, book, null);
         for (File chapter : pages) {
             parser.addContent(chapter.getName().replaceAll(" ", ""), Helper.iFile.read(chapter.getAbsolutePath()));
         }
         Map<String, Integer> tocLevels = new TOCGenerator(5, parser.getTOCList()).getTocLevels();
 
         //Second Run to fix TOC
-        parser = new ScribdParser(pages.size() - 1, book, tocLevels);
+        parser = new ScribdBookParser(pages.size() - 1, book, tocLevels);
         for (File chapter : pages) {
             parser.addContent(chapter.getName().replaceAll(" ", ""), Helper.iFile.read(chapter.getAbsolutePath()));
         }
@@ -497,10 +506,13 @@ public class ScribdParser {
             //create zip script
             context = new VelocityContext();
             context.put("title", book.title);
+            context.put("epub_dir", epub.getAbsolutePath());
             File zip = new File(epub, "zip_epub");
             Helper.iFile.write(zip.getAbsolutePath(), Helper.VelocityTemplate.evaluate("zip_epub", context));
             Set<PosixFilePermission> permissions = PosixFilePermissions.fromString("rwxr--r--");
             Files.setPosixFilePermissions(zip.toPath(), permissions);
+
+            Exec.executeBatchScript(zip);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -515,10 +527,16 @@ public class ScribdParser {
                 ObjectMapper mapper = new ObjectMapper();
                 bookInfo = mapper.readValue(data, BookInfo.class);
             } else {
+                String title = bookName;
+                String author = "author";
+                if (bookName.contains("|")) {
+                    title  = bookName.substring(0, bookName.indexOf("|")).trim();
+                    author = bookName.substring(bookName.indexOf("|") + 1).trim();
+                }
                 bookInfo = new BookInfo();
                 bookInfo.uuid = UUID.randomUUID().toString();
-                bookInfo.title = bookName;
-                bookInfo.author = "author";
+                bookInfo.title = title;
+                bookInfo.author = author;
                 bookInfo.fullImageWidth = 400;
                 bookInfo.imageResizeFactor = 0.75f;
                 ObjectMapper mapper = new ObjectMapper();

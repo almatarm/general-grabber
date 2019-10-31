@@ -1,5 +1,18 @@
 #!/bin/bash
+cd "$epub_dir"
 zip -X0 "${title}.epub" mimetype
 zip -rDX9 "${title}.epub" * -x "*.DS_Store" -x mimetype -x zip_epub
+rm -rf ../dist
 mkdir ../dist
 mv "${title}.epub" ../dist/
+
+# Mobi File
+cd ../dist
+#/Users/almatarm/apps/kindlegen "${title}.epub"
+/Applications/calibre.app/Contents/MacOS/ebook-convert "${title}.epub" "${title}.mobi" --cover ../epub/OEBPS/images/cover.jpg
+
+# KPF File
+#rm -rf /tmp/KPF
+#mkdir /tmp/KPF
+#kindlepreviewer "${title}.epub"  -convert -output /tmp/KPF
+#mv -v /tmp/KPF/KPF/*.kpf .
