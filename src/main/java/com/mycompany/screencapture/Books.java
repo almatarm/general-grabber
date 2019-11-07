@@ -45,6 +45,9 @@ public class Books {
         names.add("Rosemary Gladstar's Medicinal Herbs | Rosemary Gladstar");
         names.add("Reiki for Beginners | David Vennells");
         names.add("Dysautonomia, POTS Syndrome | Frederick Earlstein");
+        names.add("Elements of Style - Designing a Home & a Life | Erin Gates");
+        names.add("Summary and Analysis of Thinking, Fast and Slow | Worth Books");
+        names.add("Summary and Analysis of Guns, Germs, and Steel | Jared Diamond");
     }
 
     public static ArrayList<String> getNames() {

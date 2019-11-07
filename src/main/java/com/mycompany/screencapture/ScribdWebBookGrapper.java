@@ -11,6 +11,9 @@ import org.jsoup.select.Elements;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by almatarm on 23/08/2019.
@@ -35,6 +38,7 @@ public class ScribdWebBookGrapper {
         boolean autoPageDetect = true;
         boolean downloadImages = true;
         boolean tocOnly = false;
+        int waitForPageRenderingDelay = 6000;
 
         int renderedSrcX = config.getInt("renderedSrcX");
         int renderedSrcY = config.getInt("renderedSrcY");
@@ -60,7 +64,7 @@ public class ScribdWebBookGrapper {
             System.out.println("Ready");
 
             for(int i = 0; i < repeat; i++) {
-                writePageToDisk(renderedSrcX, renderedSrcY, src, String.format("Page%03d.html", start+ i), downloadImages);
+                writePageToDisk(renderedSrcX, renderedSrcY, src, String.format("Page%03d.html", start+ i), downloadImages, waitForPageRenderingDelay);
             }
         };
 
@@ -91,7 +95,7 @@ public class ScribdWebBookGrapper {
                 Helper.enter();
 
                 Helper.delay(5000);
-                writePageToDisk(renderedSrcX, renderedSrcY, src, String.format("Chapter%03d.html", i+1), downloadImages);
+                writePageToDisk(renderedSrcX, renderedSrcY, src, String.format("Chapter%03d.html", i+1), downloadImages, waitForPageRenderingDelay);
             }
         };
 
@@ -99,11 +103,15 @@ public class ScribdWebBookGrapper {
     }
 
     private static void writePageToDisk(int renderedSrcX, int renderedSrcY, File baseDir, String fileName) {
-        writePageToDisk(renderedSrcX, renderedSrcY, baseDir, fileName, true);
+        writePageToDisk(renderedSrcX, renderedSrcY, baseDir, fileName, true, 1000);
     }
 
-    private static void writePageToDisk(int renderedSrcX, int renderedSrcY, File baseDir, String fileName, boolean downloadImages) {
+    private static void writePageToDisk(int renderedSrcX, int renderedSrcY, File baseDir, String fileName,
+                                        boolean downloadImages,
+                                        int waitForPageRenderingDelay) {
         boolean pageHasImages = false;
+
+        Helper.delay(waitForPageRenderingDelay);
 
         Helper.Mouse.clickB1(renderedSrcX, renderedSrcY);
         Helper.delay(1000);
@@ -116,24 +124,27 @@ public class ScribdWebBookGrapper {
 
         //Get Images
         if(downloadImages) {
-            Document doc = Jsoup.parse(contents);
-            Element aria_main = doc.getElementById("aria_main");
-            if (aria_main != null) {
-                Elements imgs = aria_main.getElementsByTag("img");
-                imgs.forEach(img -> {
-                    String src = img.attr("src");
-                    String url = "https://www.scribd.com" + src;
-                    String imgFileName = src.substring(src.lastIndexOf("/") + 1, src.indexOf("?"));
-                    String filePath = new File(baseDir, imgFileName).getAbsolutePath();
-                    System.out.println("Downloading... " + url + " -> " + filePath);
-                    if(!new File(filePath).exists()) {
-                        Helper.Web.downloadImage(url, filePath);
-                        Helper.delay(5000);
-                    }
-                });
-                pageHasImages = !imgs.isEmpty();
+//            Document doc = Jsoup.parse(contents);
+//            Element aria_main = doc.getElementById("aria_main");
+            List<String> imageUrls = getImageUrls(contents);
+//            if (aria_main != null) {
+//                Elements imgs = aria_main.getElementsByTag("img");
+            int curImg = 1;
+            for(String url : imageUrls) {
+//            for(Element img: imgs) {
+//                String src = img.attr("src");
+//                String url = "https://www.scribd.com" + src;
+                String imgFileName = url.substring(url.lastIndexOf("/") + 1, url.indexOf("?"));
+                String filePath = new File(baseDir, imgFileName).getAbsolutePath();
+                System.out.println(String.format("[%d/%d] Downloading... %s %n\t\t -> %s", curImg++, imageUrls.size(), url, filePath));
+                if(!new File(filePath).exists()) {
+                    Helper.Web.downloadImage(url, filePath);
+                    Helper.delay(3000);
+                }
             }
+            pageHasImages = !imageUrls.isEmpty();
         }
+//        }
         String pagePath = new File(baseDir,fileName).getAbsolutePath();
         Helper.iFile.write(pagePath, Helper.ClipBoard.getContent());
 
@@ -142,6 +153,27 @@ public class ScribdWebBookGrapper {
         Helper.clickRight();
 
 //        Helper.delay((int) (Math.random() * 20000) + (pageHasImages? 10000: 0));
+    }
+
+
+    public static List<String> getImageUrls(String content) {
+        List<String> links = new ArrayList<>();
+
+        Pattern p = Pattern.compile("<img.*?>");
+        Matcher m = p.matcher(content);
+
+        int count = 0;
+        while( m.find() ) {
+            String imgTxt = m.group();
+            if (imgTxt.contains("scepub")) {
+                String src = imgTxt.substring(imgTxt.indexOf("/scepub"));
+                src = src.substring(0, src.indexOf("\""));
+                String url = "https://www.scribd.com" + src;
+                links.add(url);
+            }
+        }
+
+        return links;
     }
 
     private static String getRenderedPage(int renderedSrcX, int renderedSrcY) {
