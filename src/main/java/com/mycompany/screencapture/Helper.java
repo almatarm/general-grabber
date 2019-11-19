@@ -21,7 +21,7 @@ import java.util.TimerTask;
  * Created by almatarm on 23/08/2019.
  */
 public class Helper {
-    private static Robot robot;
+    public static Robot robot;
 
     static {
         try {

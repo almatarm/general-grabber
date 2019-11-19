@@ -15,8 +15,8 @@ import static org.bouncycastle.asn1.x500.style.RFC4519Style.name;
  */
 public class AudiobookeRenamer {
     public static void main(String[] args) throws ID3Exception {
-        File dir = new File("/Users/almatarm/Documents/Book");
-        int firstTrack = 1;
+        File dir = new File("/Users/almatarm/Documents/Books2");
+        int firstTrack = 13;
         File[] files = dir.listFiles();
         for(File file : files) {
             if(file.getName().equals(".DS_Store")) {

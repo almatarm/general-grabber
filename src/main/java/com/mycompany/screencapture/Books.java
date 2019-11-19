@@ -48,6 +48,8 @@ public class Books {
         names.add("Elements of Style - Designing a Home & a Life | Erin Gates");
         names.add("Summary and Analysis of Thinking, Fast and Slow | Worth Books");
         names.add("Summary and Analysis of Guns, Germs, and Steel | Jared Diamond");
+        names.add("Snapshot of Eat Move Sleep - How Small Choices Lead to Big Changes | Scribd");
+        names.add("Mastering Qt 5 | Guillaume Lazar and Robin Penea");
     }
 
     public static ArrayList<String> getNames() {

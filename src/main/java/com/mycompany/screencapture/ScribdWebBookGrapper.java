@@ -33,12 +33,12 @@ public class ScribdWebBookGrapper {
 //        config.addProperty("books_dir", "Sync/Scribd Books");
 //        settings.save();
 
-        int start = 0;
+        int start = 116;
         int repeat =230;
         boolean autoPageDetect = true;
         boolean downloadImages = true;
         boolean tocOnly = false;
-        int waitForPageRenderingDelay = 6000;
+        int waitForPageRenderingDelay = 500;
 
         int renderedSrcX = config.getInt("renderedSrcX");
         int renderedSrcY = config.getInt("renderedSrcY");
@@ -89,9 +89,11 @@ public class ScribdWebBookGrapper {
                 Helper.Mouse.clickB1(tocX, tocY);
 //                Helper.delay(500);
                 Helper.tab();
+                Helper.robot.setAutoDelay(3);
                 for(int j = 0; j < i; j++) {
                     Helper.arrowDown();
                 }
+                Helper.robot.setAutoDelay(100);
                 Helper.enter();
 
                 Helper.delay(5000);

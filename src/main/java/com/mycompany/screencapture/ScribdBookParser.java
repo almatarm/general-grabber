@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -245,8 +246,17 @@ public class ScribdBookParser {
         });
     }
 
+    private String getStartingSpaces(Element element) {
+        String text = element.text();
+        String html = element.html();
+        if(html.contains("<"))
+            text = element.html().substring(0, html.indexOf("<"));
+        int count = StringUtils.countMatches(text, "&nbsp;");
+        return StringUtils.repeat("&#160;", count *2);
+    }
     private void preUpdateStatus(Element element, boolean mixed) {
         text = element.text();
+        if(element.html().contains("&nbsp;")) text = getStartingSpaces(element) + text;
         if(NumberUtils.isNumber(text.trim()) && buff.length() == 19 && tocLevels != null) {
             isChapterHeadingANumber = true;
             elementsProccessedAfterHeading = 0;
