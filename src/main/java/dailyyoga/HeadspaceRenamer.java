@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.sun.tools.doclint.Entity.part;
 
 /**
  * Created by almatarm on 10/10/2019.

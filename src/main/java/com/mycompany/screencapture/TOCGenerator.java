@@ -2,7 +2,6 @@ package com.mycompany.screencapture;
 
 import java.util.*;
 
-import static com.sun.tools.doclint.Entity.le;
 
 /**
  * Created by almatarm on 28/08/2019.

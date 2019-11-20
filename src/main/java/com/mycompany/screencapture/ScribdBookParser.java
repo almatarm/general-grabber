@@ -3,9 +3,11 @@ package com.mycompany.screencapture;
 import com.almatarm.app.common.AppSettings;
 import com.almatarm.lego.io.Exec;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dailyyoga.StringUtils2;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.jsoup.Jsoup;
@@ -31,10 +33,11 @@ public class ScribdBookParser {
     boolean isTOCProccessed = false;
     boolean newChapter = false;
     boolean isChapterHeadingANumber = false;
-    int elementsProccessedAfterHeading = 0;
+    int elementsProcessedAfterHeading = 0;
     String coverImage = null;
     List<String> toc = new ArrayList<>();
     Map<String, Integer> tocLevels;
+    int nbspMultiple = 5;
 
     enum Status {
         TagBegin, TagBody, TagEnd, NoTag;
@@ -82,7 +85,7 @@ public class ScribdBookParser {
     }
 
     private void processElement(Element element) {
-        elementsProccessedAfterHeading++;
+        elementsProcessedAfterHeading++;
         if(!element.getElementsByTag("img").isEmpty() && !isMixedElement(element)) {
             buff.append(processImage(element, true));
         } else if(!isMixedElement(element)) {
@@ -92,7 +95,7 @@ public class ScribdBookParser {
             processMixedElement(element);
         }
         postUpdateStatus(element);
-        if(elementsProccessedAfterHeading > 1) {
+        if(elementsProcessedAfterHeading > 1) {
             isChapterHeadingANumber = false;
         }
     }
@@ -206,7 +209,7 @@ public class ScribdBookParser {
                     linkIdx++;
                 } else if(isChapterHeadingANumber) {
                     secBuff.append(String.format("<h1>%s</h1>", linkText));
-                    if(elementsProccessedAfterHeading > 0) isChapterHeadingANumber = false;
+                    if(elementsProcessedAfterHeading > 0) isChapterHeadingANumber = false;
                 } else {
                     //secBuff.append(String.format("<a href=#>%s</a>", linkText));
                     secBuff.append(String.format("<u>%s</u>", linkText));
@@ -252,14 +255,16 @@ public class ScribdBookParser {
         if(html.contains("<"))
             text = element.html().substring(0, html.indexOf("<"));
         int count = StringUtils.countMatches(text, "&nbsp;");
-        return StringUtils.repeat("&#160;", count *2);
+        return StringUtils.repeat("&#160;", count * nbspMultiple);
     }
+
     private void preUpdateStatus(Element element, boolean mixed) {
         text = element.text();
+        text = StringUtils2.encodeHtml(text);
         if(element.html().contains("&nbsp;")) text = getStartingSpaces(element) + text;
         if(NumberUtils.isNumber(text.trim()) && buff.length() == 19 && tocLevels != null) {
             isChapterHeadingANumber = true;
-            elementsProccessedAfterHeading = 0;
+            elementsProcessedAfterHeading = 0;
         }
         if(text.contains("Content")) isTOCProccessed = true;
         Helper.Debug.println("preU: " + text);
