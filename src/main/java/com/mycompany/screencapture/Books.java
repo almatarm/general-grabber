@@ -50,6 +50,9 @@ public class Books {
         names.add("Summary and Analysis of Guns, Germs, and Steel | Jared Diamond");
         names.add("Snapshot of Eat Move Sleep - How Small Choices Lead to Big Changes | Scribd");
         names.add("Mastering Qt 5 | Guillaume Lazar and Robin Penea");
+        names.add("Street Spanish 3 - The Best of Naughty Spanish | David Burke");
+        names.add("Spanish - General Knowledge Workout #1 | Sam Fuentes");
+        names.add("A1 Bundle - Spanish Novels for Beginners | Paco Ardit");
     }
 
     public static ArrayList<String> getNames() {

@@ -33,7 +33,7 @@ public class ScribdWebBookGrapper {
 //        config.addProperty("books_dir", "Sync/Scribd Books");
 //        settings.save();
 
-        int start = 116;
+        int start = 0;
         int repeat =230;
         boolean autoPageDetect = true;
         boolean downloadImages = true;

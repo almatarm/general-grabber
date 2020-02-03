@@ -11,6 +11,12 @@
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
 
     <dependencies>
         <!-- https://mvnrepository.com/artifact/com.1stleg/jnativehook -->
@@ -46,11 +52,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>LATEST</version>
-        </dependency>
-        <dependency>
             <groupId>com.almatarm</groupId>
             <artifactId>SmallUtil</artifactId>
             <version>1.0.1</version>
@@ -62,11 +63,6 @@
             <version>1.0</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-configuration2</artifactId>
-            <version>2.6</version>
-        </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-configuration2</artifactId>
@@ -101,6 +97,13 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.5</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.github.goxr3plus</groupId>
+            <artifactId>jaudiotagger</artifactId>
+            <version>2.2.7</version>
+        </dependency>
+
 
 
     </dependencies>
