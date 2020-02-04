@@ -53,6 +53,11 @@ public class Books {
         names.add("Street Spanish 3 - The Best of Naughty Spanish | David Burke");
         names.add("Spanish - General Knowledge Workout #1 | Sam Fuentes");
         names.add("A1 Bundle - Spanish Novels for Beginners | Paco Ardit");
+        names.add("A2 Bundle - Spanish Novels for Beginners | Paco Ardit");
+        names.add("B1 Bundle - Spanish Novels for Beginners | Paco Ardit");
+        names.add("B2 Bundle - Spanish Novels for Beginners | Paco Ardit");
+        names.add("C1 Bundle - Spanish Novels for Beginners | Paco Ardit");
+        names.add("C2 Bundle - Spanish Novels for Beginners | Paco Ardit");
     }
 
     public static ArrayList<String> getNames() {
