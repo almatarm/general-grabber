@@ -58,6 +58,7 @@ public class Books {
         names.add("B2 Bundle - Spanish Novels for Beginners | Paco Ardit");
         names.add("C1 Bundle - Spanish Novels for Beginners | Paco Ardit");
         names.add("C2 Bundle - Spanish Novels for Beginners | Paco Ardit");
+        names.add("Qt5 C++ GUI Programming Cookbook | Eng Lee Zhi");
     }
 
     public static ArrayList<String> getNames() {
